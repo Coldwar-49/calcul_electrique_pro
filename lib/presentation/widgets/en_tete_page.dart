@@ -37,6 +37,15 @@ class EnTetePage extends StatelessWidget {
         bottom: false,
         child: Row(
           children: [
+            // Sur téléphone, le menu latéral s'ouvre depuis le bandeau.
+            if (Scaffold.maybeOf(context)?.hasDrawer ?? false) ...[
+              IconButton(
+                tooltip: 'Menu',
+                onPressed: () => Scaffold.of(context).openDrawer(),
+                icon: Icon(Icons.menu_rounded, color: cs.onPrimary),
+              ),
+              const SizedBox(width: 4),
+            ],
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(

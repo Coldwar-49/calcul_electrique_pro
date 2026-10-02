@@ -6,8 +6,10 @@ import '../widgets/credit_auteur.dart';
 import 'chute_tension_screen.dart';
 import 'contacts_indirects_screen.dart';
 import 'contrainte_thermique_screen.dart';
+import 'filiation_screen.dart';
 import 'ik_max_screen.dart';
 import 'ik_min_screen.dart';
+import 'pouvoir_de_coupure_screen.dart';
 import 'regle_triangle_screen.dart';
 import 'resistance_pe_screen.dart';
 import 'surcharges_screen.dart';
@@ -32,6 +34,9 @@ const _destinations = [
   _Destination('Résistance du PE', Icons.vertical_align_bottom_outlined,
       Icons.vertical_align_bottom),
   _Destination('Contacts indirects', Icons.back_hand_outlined, Icons.back_hand),
+  _Destination('Pouvoir de coupure', Icons.shield_moon_outlined,
+      Icons.shield_moon),
+  _Destination('Filiation', Icons.account_tree_outlined, Icons.account_tree),
 ];
 
 const _pages = <Widget>[
@@ -43,6 +48,8 @@ const _pages = <Widget>[
   RegleTriangleScreen(),
   ResistancePeScreen(),
   ContactsIndirectsScreen(),
+  PouvoirDeCoupureScreen(),
+  FiliationScreen(),
 ];
 
 /// Coque de l'application : rail latéral sur grand écran, barre en bas sinon.
@@ -58,22 +65,45 @@ class AccueilShell extends ConsumerWidget {
     final page = IndexedStack(index: index, children: _pages);
 
     if (!large) {
+      // Neuf écrans : menu latéral coulissant (ouvert par le bouton du bandeau).
       return Scaffold(
-        body: page,
-        bottomNavigationBar: NavigationBar(
-          // Huit écrans : seul le libellé de l'écran actif reste affiché.
-          labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
-          selectedIndex: index,
-          onDestinationSelected: nav.aller,
-          destinations: [
-            for (final d in _destinations)
-              NavigationDestination(
-                icon: Icon(d.icone),
-                selectedIcon: Icon(d.iconeActive),
-                label: d.libelle,
-              ),
-          ],
+        drawer: Drawer(
+          child: SafeArea(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const _Marque(toujoursEtendue: true),
+                Expanded(
+                  child: ListView(
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    children: [
+                      for (final (i, d) in _destinations.indexed)
+                        ListTile(
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(28)),
+                          selected: i == index,
+                          selectedTileColor:
+                              Theme.of(context).colorScheme.primaryContainer,
+                          leading: Icon(i == index ? d.iconeActive : d.icone),
+                          title: Text(d.libelle,
+                              maxLines: 1, overflow: TextOverflow.ellipsis),
+                          onTap: () {
+                            nav.aller(i);
+                            Navigator.of(context).pop();
+                          },
+                        ),
+                    ],
+                  ),
+                ),
+                const Padding(
+                  padding: EdgeInsets.fromLTRB(28, 12, 16, 16),
+                  child: CreditAuteur(),
+                ),
+              ],
+            ),
+          ),
         ),
+        body: page,
       );
     }
 
@@ -126,12 +156,15 @@ class AccueilShell extends ConsumerWidget {
 }
 
 class _Marque extends StatelessWidget {
-  const _Marque();
+  const _Marque({this.toujoursEtendue = false});
+
+  /// true : logo et nom, quelle que soit la largeur (menu latéral).
+  final bool toujoursEtendue;
 
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
-    final etendu = MediaQuery.sizeOf(context).width >= 1200;
+    final etendu = toujoursEtendue || MediaQuery.sizeOf(context).width >= 1200;
     final logo = Container(
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
@@ -149,15 +182,14 @@ class _Marque extends StatelessWidget {
               children: [
                 logo,
                 const SizedBox(width: 12),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('Calcul Électrique Pro',
-                        style: Theme.of(context)
-                            .textTheme
-                            .titleSmall
-                            ?.copyWith(fontWeight: FontWeight.w700)),
-                  ],
+                Flexible(
+                  child: Text('Calcul Électrique Pro',
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: Theme.of(context)
+                          .textTheme
+                          .titleSmall
+                          ?.copyWith(fontWeight: FontWeight.w700)),
                 ),
               ],
             )

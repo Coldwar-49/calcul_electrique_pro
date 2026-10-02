@@ -175,6 +175,51 @@ void main() {
     expect(find.textContaining('1,88'), findsWidgets);
   });
 
+  testWidgets('Filiation : tableau, appareils et conclusion', (tester) async {
+    await _ouvrir(tester, const Size(1400, 1400));
+
+    await tester.tap(find.text('Filiation').first);
+    await tester.pumpAndSettle();
+    expect(find.text('Filiation').first, findsOneWidget);
+    // Par défaut : 2012, 400 V, premier tableau, premiers appareils, Ik 10 kA.
+    expect(find.textContaining('Pouvoir de coupure renforcé de'),
+        findsOneWidget);
+    expect(find.textContaining('Amonts possibles pour'), findsOneWidget);
+
+    // Changer le catalogue recharge les tableaux sans erreur.
+    await tester.tap(find.text('Année 2012'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Année 1998/1999').last);
+    await tester.pumpAndSettle();
+    expect(find.text('Année 1998/1999'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Pouvoir de coupure : IT, fusibles, disjoncteurs moteurs',
+      (tester) async {
+    await _ouvrir(tester, const Size(1400, 1400));
+
+    await tester.tap(find.text('Pouvoir de coupure').first);
+    await tester.pumpAndSettle();
+    // DT 40 : 2 kA, Id2 = 3 kA par défaut -> insuffisant.
+    expect(find.text('Pouvoir de coupure insuffisant (Id2 = 3 kA)'),
+        findsOneWidget);
+
+    // Fusibles gG 16 A, 8,5 x 31,5 : 20 kA, Ik 10 kA -> suffisant.
+    await tester.tap(find.text('Fusibles'));
+    await tester.pumpAndSettle();
+    expect(find.text('Pouvoir de coupure suffisant (Ik = 10 kA)'),
+        findsOneWidget);
+    expect(find.text('Fusibles à couteaux'), findsOneWidget);
+
+    // Disjoncteurs moteurs : GV2 ME 01 à 08, 10, 14 = 100 kA.
+    await tester.tap(find.text('Disj. moteurs'));
+    await tester.pumpAndSettle();
+    expect(find.text('Pdc — GV2 ME 01 à 08, 10, 14'), findsOneWidget);
+    expect(find.text('Pouvoir de coupure suffisant (Ik = 10 kA)'),
+        findsOneWidget);
+  });
+
   testWidgets('Résistance du PE : disjoncteur puis fusibles', (tester) async {
     await _ouvrir(tester, const Size(1400, 1200));
 
@@ -207,15 +252,19 @@ void main() {
     expect(find.text('Non conforme : 14 m distribués'), findsOneWidget);
   });
 
-  testWidgets('téléphone : barre de navigation en bas, pas de débordement',
+  testWidgets('téléphone : menu latéral, 10 écrans sans débordement',
       (tester) async {
     await _ouvrir(tester, const Size(390, 844));
 
-    expect(find.byType(NavigationBar), findsOneWidget);
     expect(find.byType(NavigationRail), findsNothing);
-    final destinations = find.byType(NavigationDestination);
-    expect(destinations, findsNWidgets(8));
-    for (var i = 0; i < 8; i++) {
+    expect(find.byType(NavigationBar), findsNothing);
+    for (var i = 0; i < 10; i++) {
+      // Ouvre le menu depuis le bandeau de l'écran affiché, puis choisit l'écran i.
+      await tester.tap(find.byTooltip('Menu').first);
+      await tester.pumpAndSettle();
+      final destinations = find.descendant(
+          of: find.byType(Drawer), matching: find.byType(ListTile));
+      expect(destinations, findsNWidgets(10));
       await tester.tap(destinations.at(i));
       await tester.pumpAndSettle();
       expect(tester.takeException(), isNull, reason: 'écran $i');
