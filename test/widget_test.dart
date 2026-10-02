@@ -274,36 +274,77 @@ void main() {
     expect(find.text('Non conforme : 14 m distribués'), findsOneWidget);
   });
 
-  testWidgets('menu à gauche, par ordre alphabétique', (tester) async {
-    const attendu = [
+  testWidgets('menu à gauche : rubriques et entrées par ordre alphabétique',
+      (tester) async {
+    const rubriques = ['CIRCUITS', 'COURT-CIRCUIT', 'PROTECTION', 'RÉFÉRENCES'];
+    const entrees = [
       'Chute de tension',
-      'Contacts indirects',
       'Contrainte thermique',
-      'Filiation',
+      'Surcharges',
       'Ik max',
       'Ik min',
-      'Influences externes',
-      'Pouvoir de coupure',
       'Règle du triangle',
+      'Contacts indirects',
+      'Filiation',
+      'Pouvoir de coupure',
       'Résistance du PE',
-      'Surcharges',
+      'Influences externes',
     ];
-    List<String> libelles() => [
-          for (final t in tester.widgetList<Text>(find.descendant(
-              of: find.byType(NavigationRail), matching: find.byType(Text))))
-            if (attendu.contains(t.data)) t.data!,
-        ];
+    final menu = find.byKey(const ValueKey('menu-lateral'));
 
-    // Fenêtre large : menu fixe à gauche avec les libellés.
+    // Fenêtre large : menu fixe à gauche, rubriques puis entrées.
     await _ouvrir(tester, const Size(1400, 1000));
-    expect(libelles(), attendu);
-    expect(tester.getTopLeft(find.byType(NavigationRail)).dx, 0);
+    expect(tester.getTopLeft(menu).dx, 0);
+    final textes = [
+      for (final t in tester.widgetList<Text>(
+          find.descendant(of: menu, matching: find.byType(Text))))
+        if (t.data != null) t.data!,
+    ];
+    expect([for (final t in textes) if (rubriques.contains(t)) t], rubriques);
+    expect([for (final t in textes) if (entrees.contains(t)) t], entrees);
+    // Ordre complet : chaque rubrique est suivie de ses entrées.
+    expect(textes.indexOf('CIRCUITS'), lessThan(textes.indexOf('Chute de tension')));
+    expect(textes.indexOf('Surcharges'), lessThan(textes.indexOf('COURT-CIRCUIT')));
+    expect(textes.indexOf('Résistance du PE'),
+        lessThan(textes.indexOf('RÉFÉRENCES')));
 
-    // Fenêtre étroite (600 à 900 px) : le menu reste fixe à gauche.
+    // Fenêtre étroite (600 à 900 px) : menu fixe à gauche, icônes seules.
     await _ouvrir(tester, const Size(700, 1000));
     await tester.pumpAndSettle();
-    expect(find.byType(NavigationRail), findsOneWidget);
-    expect(libelles(), attendu);
+    expect(tester.getTopLeft(menu).dx, 0);
+    expect(tester.getSize(menu).width, 80);
+    final infobulles = [
+      for (final t in tester.widgetList<Tooltip>(
+          find.descendant(of: menu, matching: find.byType(Tooltip))))
+        t.message!,
+    ];
+    expect(infobulles, entrees);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('menu à gauche : défile dans une fenêtre basse, dernière entrée atteignable',
+      (tester) async {
+    // 1400 x 360 : bien trop bas pour 11 entrées et 4 rubriques.
+    await _ouvrir(tester, const Size(1400, 360));
+    expect(tester.takeException(), isNull);
+
+    final menu = find.byKey(const ValueKey('menu-lateral'));
+    // La dernière entrée n'est pas encore affichée (liste défilante)…
+    final derniere =
+        find.descendant(of: menu, matching: find.text('Influences externes'));
+    expect(derniere, findsNothing);
+    // …mais on peut y accéder en faisant défiler le menu,
+    await tester.scrollUntilVisible(derniere, 100,
+        scrollable:
+            find.descendant(of: menu, matching: find.byType(Scrollable)));
+    await tester.pumpAndSettle();
+    expect(derniere, findsOneWidget);
+    expect(tester.getTopLeft(derniere).dy, lessThan(360));
+    // …et le crédit reste visible en bas, sans défilement.
+    final credit = find.descendant(
+        of: menu, matching: find.text('Créé par Devismes Fabrice'));
+    expect(credit, findsOneWidget);
+    expect(tester.getTopLeft(credit).dy, lessThan(360));
     expect(tester.takeException(), isNull);
   });
 
@@ -311,7 +352,7 @@ void main() {
       (tester) async {
     await _ouvrir(tester, const Size(390, 844));
 
-    expect(find.byType(NavigationRail), findsNothing);
+    expect(find.byKey(const ValueKey('menu-lateral')), findsNothing);
     expect(find.byType(NavigationBar), findsNothing);
     for (var i = 0; i < 11; i++) {
       // Ouvre le menu depuis le bandeau de l'écran affiché, puis choisit l'écran i.
