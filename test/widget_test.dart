@@ -151,6 +151,30 @@ void main() {
     expect(find.text('Sans protection'), findsNothing);
   });
 
+  testWidgets('Contacts indirects : disjoncteur, fusible et avertissements',
+      (tester) async {
+    await _ouvrir(tester, const Size(1400, 1400));
+
+    await tester.tap(find.text('Contacts indirects').first);
+    await tester.pumpAndSettle();
+    // C 10 A, 2,5 mm² cuivre, 230 V, TN : 0,8·230·2,5/(2·0,023·10·10) = 100 m.
+    expect(find.text('100,0'), findsWidgets);
+    expect(find.byIcon(Icons.warning_amber_rounded), findsNothing);
+
+    // Fusible aM, Sph ≠ Spe : deux avertissements (coefficient 1,88).
+    await tester.tap(find.text('Fusible'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Sph ≠ Spe'));
+    await tester.pumpAndSettle();
+    expect(find.byIcon(Icons.warning_amber_rounded), findsNothing);
+    await tester.tap(find.text('gG'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('aM').last);
+    await tester.pumpAndSettle();
+    expect(find.byIcon(Icons.warning_amber_rounded), findsOneWidget);
+    expect(find.textContaining('1,88'), findsWidgets);
+  });
+
   testWidgets('Résistance du PE : disjoncteur puis fusibles', (tester) async {
     await _ouvrir(tester, const Size(1400, 1200));
 
@@ -190,8 +214,8 @@ void main() {
     expect(find.byType(NavigationBar), findsOneWidget);
     expect(find.byType(NavigationRail), findsNothing);
     final destinations = find.byType(NavigationDestination);
-    expect(destinations, findsNWidgets(7));
-    for (var i = 0; i < 7; i++) {
+    expect(destinations, findsNWidgets(8));
+    for (var i = 0; i < 8; i++) {
       await tester.tap(destinations.at(i));
       await tester.pumpAndSettle();
       expect(tester.takeException(), isNull, reason: 'écran $i');

@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/navigation_provider.dart';
 import '../widgets/credit_auteur.dart';
 import 'chute_tension_screen.dart';
+import 'contacts_indirects_screen.dart';
 import 'contrainte_thermique_screen.dart';
 import 'ik_max_screen.dart';
 import 'ik_min_screen.dart';
@@ -30,6 +31,7 @@ const _destinations = [
       'Règle du triangle', Icons.change_history_outlined, Icons.change_history),
   _Destination('Résistance du PE', Icons.vertical_align_bottom_outlined,
       Icons.vertical_align_bottom),
+  _Destination('Contacts indirects', Icons.back_hand_outlined, Icons.back_hand),
 ];
 
 const _pages = <Widget>[
@@ -40,6 +42,7 @@ const _pages = <Widget>[
   IkMinScreen(),
   RegleTriangleScreen(),
   ResistancePeScreen(),
+  ContactsIndirectsScreen(),
 ];
 
 /// Coque de l'application : rail latéral sur grand écran, barre en bas sinon.
@@ -58,7 +61,7 @@ class AccueilShell extends ConsumerWidget {
       return Scaffold(
         body: page,
         bottomNavigationBar: NavigationBar(
-          // Sept écrans : seul le libellé de l'écran actif reste affiché.
+          // Huit écrans : seul le libellé de l'écran actif reste affiché.
           labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
           selectedIndex: index,
           onDestinationSelected: nav.aller,
