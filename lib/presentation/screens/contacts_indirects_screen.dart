@@ -49,9 +49,39 @@ class _Formulaire extends ConsumerWidget {
         !fusible && e.typeDisjoncteur == TypeDisjoncteurPe.industriel;
     final sections = {for (final s in sectionsUsuelles) s: fmtCompact(s)};
 
+    final cs = Theme.of(context).colorScheme;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
+        // Conditions d'utilisation de l'outil d'origine (onglet « Mode d'emploi »).
+        Container(
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            color: cs.secondaryContainer,
+            borderRadius: BorderRadius.circular(14),
+          ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Icon(Icons.info_outline_rounded,
+                  size: 20, color: cs.onSecondaryContainer),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  'Méthode conventionnelle, visite périodique uniquement. Cet '
+                  'outil ne remplace ni un logiciel de calcul agréé (de type '
+                  'Caneco) ni une note de calculs : à n\'utiliser que lorsque '
+                  'aucune note de calculs n\'est présentée lors du contrôle.',
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodySmall
+                      ?.copyWith(color: cs.onSecondaryContainer),
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 16),
         CarteSection(
           titre: 'Régime de neutre et tensions',
           icone: Icons.power_outlined,

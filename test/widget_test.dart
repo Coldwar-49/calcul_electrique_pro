@@ -157,6 +157,8 @@ void main() {
 
     await tester.tap(find.text('Contacts indirects').first);
     await tester.pumpAndSettle();
+    expect(find.textContaining('ne remplace ni un logiciel de calcul agréé'),
+        findsOneWidget);
     // C 10 A, 2,5 mm² cuivre, 230 V, TN : 0,8·230·2,5/(2·0,023·10·10) = 100 m.
     expect(find.text('100,0'), findsWidgets);
     expect(find.byIcon(Icons.warning_amber_rounded), findsNothing);
@@ -173,6 +175,26 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.byIcon(Icons.warning_amber_rounded), findsOneWidget);
     expect(find.textContaining('1,88'), findsWidgets);
+  });
+
+  testWidgets('Influences externes : niveaux par défaut puis immersion',
+      (tester) async {
+    await _ouvrir(tester, const Size(1400, 1600));
+
+    await tester.tap(find.text('Influences externes').first);
+    await tester.pumpAndSettle();
+    // Niveaux par défaut : les 8 câbles conviennent, 6 conduits sur 9.
+    expect(find.text('8 / 8'), findsOneWidget);
+    expect(find.text('6 / 9'), findsOneWidget);
+    expect(find.text('Hors usage courant'), findsNWidgets(3));
+
+    // AD7 (immersion) : H05VVF (AD > 6) et H05RNF (AD > 5) ne conviennent plus.
+    await tester.tap(find.text('AD1 — Négligeable'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('AD7 — Immersion').last);
+    await tester.pumpAndSettle();
+    expect(find.text('6 / 8'), findsOneWidget);
+    expect(find.textContaining('Toléré si immersion limitée'), findsOneWidget);
   });
 
   testWidgets('Filiation : tableau, appareils et conclusion', (tester) async {
@@ -252,19 +274,52 @@ void main() {
     expect(find.text('Non conforme : 14 m distribués'), findsOneWidget);
   });
 
-  testWidgets('téléphone : menu latéral, 10 écrans sans débordement',
+  testWidgets('menu à gauche, par ordre alphabétique', (tester) async {
+    const attendu = [
+      'Chute de tension',
+      'Contacts indirects',
+      'Contrainte thermique',
+      'Filiation',
+      'Ik max',
+      'Ik min',
+      'Influences externes',
+      'Pouvoir de coupure',
+      'Règle du triangle',
+      'Résistance du PE',
+      'Surcharges',
+    ];
+    List<String> libelles() => [
+          for (final t in tester.widgetList<Text>(find.descendant(
+              of: find.byType(NavigationRail), matching: find.byType(Text))))
+            if (attendu.contains(t.data)) t.data!,
+        ];
+
+    // Fenêtre large : menu fixe à gauche avec les libellés.
+    await _ouvrir(tester, const Size(1400, 1000));
+    expect(libelles(), attendu);
+    expect(tester.getTopLeft(find.byType(NavigationRail)).dx, 0);
+
+    // Fenêtre étroite (600 à 900 px) : le menu reste fixe à gauche.
+    await _ouvrir(tester, const Size(700, 1000));
+    await tester.pumpAndSettle();
+    expect(find.byType(NavigationRail), findsOneWidget);
+    expect(libelles(), attendu);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('téléphone : menu latéral, 11 écrans sans débordement',
       (tester) async {
     await _ouvrir(tester, const Size(390, 844));
 
     expect(find.byType(NavigationRail), findsNothing);
     expect(find.byType(NavigationBar), findsNothing);
-    for (var i = 0; i < 10; i++) {
+    for (var i = 0; i < 11; i++) {
       // Ouvre le menu depuis le bandeau de l'écran affiché, puis choisit l'écran i.
       await tester.tap(find.byTooltip('Menu').first);
       await tester.pumpAndSettle();
       final destinations = find.descendant(
           of: find.byType(Drawer), matching: find.byType(ListTile));
-      expect(destinations, findsNWidgets(10));
+      expect(destinations, findsNWidgets(11));
       await tester.tap(destinations.at(i));
       await tester.pumpAndSettle();
       expect(tester.takeException(), isNull, reason: 'écran $i');

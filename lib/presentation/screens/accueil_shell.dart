@@ -8,6 +8,7 @@ import 'contacts_indirects_screen.dart';
 import 'contrainte_thermique_screen.dart';
 import 'filiation_screen.dart';
 import 'ik_max_screen.dart';
+import 'influences_externes_screen.dart';
 import 'ik_min_screen.dart';
 import 'pouvoir_de_coupure_screen.dart';
 import 'regle_triangle_screen.dart';
@@ -15,53 +16,56 @@ import 'resistance_pe_screen.dart';
 import 'surcharges_screen.dart';
 
 class _Destination {
-  const _Destination(this.libelle, this.icone, this.iconeActive);
+  const _Destination(this.libelle, this.icone, this.iconeActive, this.page);
   final String libelle;
   final IconData icone;
   final IconData iconeActive;
+  final Widget page;
 }
 
+/// Entrées du menu, par ordre alphabétique.
 const _destinations = [
-  _Destination('Surcharges', Icons.shield_outlined, Icons.shield),
+  _Destination('Chute de tension', Icons.trending_down_rounded,
+      Icons.trending_down, ChuteTensionScreen()),
+  _Destination('Contacts indirects', Icons.back_hand_outlined, Icons.back_hand,
+      ContactsIndirectsScreen()),
+  _Destination('Contrainte thermique', Icons.whatshot_outlined, Icons.whatshot,
+      ContrainteThermiqueScreen()),
+  _Destination('Filiation', Icons.account_tree_outlined, Icons.account_tree,
+      FiliationScreen()),
   _Destination(
-      'Chute de tension', Icons.trending_down_rounded, Icons.trending_down),
+      'Ik max', Icons.flash_on_outlined, Icons.flash_on, IkMaxScreen()),
   _Destination(
-      'Contrainte thermique', Icons.whatshot_outlined, Icons.whatshot),
-  _Destination('Ik max', Icons.flash_on_outlined, Icons.flash_on),
-  _Destination('Ik min', Icons.flash_off_outlined, Icons.flash_off),
-  _Destination(
-      'Règle du triangle', Icons.change_history_outlined, Icons.change_history),
-  _Destination('Résistance du PE', Icons.vertical_align_bottom_outlined,
-      Icons.vertical_align_bottom),
-  _Destination('Contacts indirects', Icons.back_hand_outlined, Icons.back_hand),
+      'Ik min', Icons.flash_off_outlined, Icons.flash_off, IkMinScreen()),
+  _Destination('Influences externes', Icons.water_drop_outlined,
+      Icons.water_drop, InfluencesExternesScreen()),
   _Destination('Pouvoir de coupure', Icons.shield_moon_outlined,
-      Icons.shield_moon),
-  _Destination('Filiation', Icons.account_tree_outlined, Icons.account_tree),
+      Icons.shield_moon, PouvoirDeCoupureScreen()),
+  _Destination('Règle du triangle', Icons.change_history_outlined,
+      Icons.change_history, RegleTriangleScreen()),
+  _Destination('Résistance du PE', Icons.vertical_align_bottom_outlined,
+      Icons.vertical_align_bottom, ResistancePeScreen()),
+  _Destination(
+      'Surcharges', Icons.shield_outlined, Icons.shield, SurchargesScreen()),
 ];
 
-const _pages = <Widget>[
-  SurchargesScreen(),
-  ChuteTensionScreen(),
-  ContrainteThermiqueScreen(),
-  IkMaxScreen(),
-  IkMinScreen(),
-  RegleTriangleScreen(),
-  ResistancePeScreen(),
-  ContactsIndirectsScreen(),
-  PouvoirDeCoupureScreen(),
-  FiliationScreen(),
-];
+final _pages = <Widget>[for (final d in _destinations) d.page];
 
-/// Coque de l'application : rail latéral sur grand écran, barre en bas sinon.
+/// L'application s'ouvre sur « Surcharges », le calcul principal.
+final int _indexAccueil =
+    _destinations.indexWhere((d) => d.libelle == 'Surcharges');
+
+/// Coque de l'application : menu fixe à gauche dès 600 px de large (avec les
+/// libellés dès 900 px), menu coulissant sur téléphone.
 class AccueilShell extends ConsumerWidget {
   const AccueilShell({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final index = ref.watch(navigationProvider);
+    final index = ref.watch(navigationProvider) ?? _indexAccueil;
     final nav = ref.read(navigationProvider.notifier);
-    final large = MediaQuery.sizeOf(context).width >= 900;
-    final etendu = MediaQuery.sizeOf(context).width >= 1200;
+    final large = MediaQuery.sizeOf(context).width >= 600;
+    final etendu = MediaQuery.sizeOf(context).width >= 900;
     final page = IndexedStack(index: index, children: _pages);
 
     if (!large) {
@@ -164,7 +168,7 @@ class _Marque extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
-    final etendu = toujoursEtendue || MediaQuery.sizeOf(context).width >= 1200;
+    final etendu = toujoursEtendue || MediaQuery.sizeOf(context).width >= 900;
     final logo = Container(
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(

@@ -3,22 +3,20 @@
 App de calculs électriques BT issue du classeur Excel **CLAUREG V3.6 (2013)**.
 Marque : DevisApps. Langue de l'UI et du code métier : français. Dart/Flutter, VS Code.
 
-## Objectif V1 : calculs de câbles
-Porter en Dart, de façon fidèle, les calculs du classeur :
-1. Protection contre les surcharges (Iz, coefficient K selon modes de pose B/C/D/E/F, choix du calibre In)
-2. Chute de tension (circuit, section, longueur, cos φ, ame cuivre/alu)
-3. Contrainte thermique
-4. Ik max (Icc Max) et Ik min (CI, CI GE)
-5. Règle du triangle
-6. Résistance maximum du PE (disjoncteurs, fusibles)
+## Objectif V1 : toutes les feuilles de calcul du classeur
+Porter en Dart, de façon fidèle, les 38 onglets de calcul/référence, répartis en 4 fichiers :
+1. `docs/claureg_extraction.md` : surcharges (Iz, K, calibre In), K méthodes B/C/D/E/F, chute de tension, contrainte thermique, Icc max, Ik min (CI, CI GE), règle du triangle, résistance PE (disjoncteurs, fusibles)
+2. `docs/modules/02_contacts_indirects_TN_IT.md` : conditions d'utilisation, TN/IT avec M=1 et M>1, fusibles m=1 et m>1
+3. `docs/modules/03_donnees_reference.md` : IP/IK câbles et conduits, valeurs IP-IK, choix table article
+4. `docs/modules/04_filiation_pouvoir_de_coupure.md` : Merlin Gerin (98-99 à 2012, Italien), PDC 1 pôle IT, coordination interrupteurs, PDC fusibles et disjoncteurs moteurs, Legrand, Hager
 
-Hors V1 : contacts indirects TN/IT, filiation constructeurs, clausier Opale, checklists BE2/BE3, HT, ERP, RICT.
+Hors V1 (à ajouter plus tard, ne pas lire ni implémenter sans demande de Fabrice) :
+- `docs/modules/05_clausier_opale.md` : clausier Opale et feuilles 1 à 63
+- `docs/modules/06_checklists_installation.md` : Armoires et coffrets BTA, BE2/BE3-Q18, HT, ERP, éclairage de sécurité, récepteurs, RICT, Surintensités, Contacts indirects
 
 ## Source de vérité
-`docs/claureg_extraction.md` : formules et valeurs de chaque cellule des onglets de calcul
-(Surcharges, K pour methode B..F, Chute de tension, Contrainte Thermique, Icc Max, Ik min CI, Ik min CI GE,
-Règle du triangle, Résistance PE DJ/Fusibles, Surintensités). Le classeur original est `CLAUREG V3.6 rev 1.xlsm`
-(à copier dans `docs/` si besoin).
+Les 4 fichiers V1 ci-dessus donnent, pour chaque onglet, la formule et la valeur calculée de chaque cellule.
+Le classeur original est `CLAUREG V3.6 rev 1.xlsm` (à copier dans `docs/` si besoin).
 
 Exemple de logique vue dans le classeur : K = M × L × (somme des coefficients selon type d'isolant/mode de pose) × 1,05 ;
 section 50 mm² remplacée par 47,5 ; table de calibres normalisés (0,5 … 800 A et plus).
