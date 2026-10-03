@@ -3,14 +3,18 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../providers/navigation_provider.dart';
 import '../widgets/credit_auteur.dart';
+import 'bilan_puissance_screen.dart';
 import 'chute_tension_screen.dart';
+import 'compensation_screen.dart';
 import 'contacts_indirects_screen.dart';
 import 'contrainte_thermique_screen.dart';
+import 'courant_emploi_screen.dart';
 import 'filiation_screen.dart';
 import 'ik_max_screen.dart';
 import 'ik_min_screen.dart';
 import 'influences_externes_screen.dart';
 import 'pouvoir_de_coupure_screen.dart';
+import 'protection_tt_screen.dart';
 import 'regle_triangle_screen.dart';
 import 'resistance_pe_screen.dart';
 import 'surcharges_screen.dart';
@@ -33,10 +37,16 @@ class _Groupe {
 /// alphabétique dans chaque rubrique. Pour ajouter un calcul : une ligne ici.
 const _groupes = [
   _Groupe('Circuits', [
+    _Destination('Bilan de puissance', Icons.calculate_outlined,
+        Icons.calculate, BilanPuissanceScreen()),
     _Destination('Chute de tension', Icons.trending_down_rounded,
         Icons.trending_down, ChuteTensionScreen()),
+    _Destination('Compensation réactive', Icons.battery_charging_full_outlined,
+        Icons.battery_charging_full, CompensationScreen()),
     _Destination('Contrainte thermique', Icons.whatshot_outlined,
         Icons.whatshot, ContrainteThermiqueScreen()),
+    _Destination('Courant d\'emploi', Icons.electric_meter_outlined,
+        Icons.electric_meter, CourantEmploiScreen()),
     _Destination(
         'Surcharges', Icons.shield_outlined, Icons.shield, SurchargesScreen()),
   ]),
@@ -55,6 +65,8 @@ const _groupes = [
         Icons.account_tree, FiliationScreen()),
     _Destination('Pouvoir de coupure', Icons.shield_moon_outlined,
         Icons.shield_moon, PouvoirDeCoupureScreen()),
+    _Destination('Protection TT par DDR', Icons.electrical_services_outlined,
+        Icons.electrical_services, ProtectionTTScreen()),
     _Destination('Résistance du PE', Icons.vertical_align_bottom_outlined,
         Icons.vertical_align_bottom, ResistancePeScreen()),
   ]),

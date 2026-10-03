@@ -10,6 +10,24 @@ Future<void> _ouvrir(WidgetTester tester, Size taille) async {
   await tester.pumpWidget(const ProviderScope(child: CalculElectriqueApp()));
 }
 
+const _libelles = [
+  'Bilan de puissance',
+  'Chute de tension',
+  'Compensation réactive',
+  'Contrainte thermique',
+  "Courant d'emploi",
+  'Surcharges',
+  'Ik max',
+  'Ik min',
+  'Règle du triangle',
+  'Contacts indirects',
+  'Filiation',
+  'Pouvoir de coupure',
+  'Protection TT par DDR',
+  'Résistance du PE',
+  'Influences externes',
+];
+
 void main() {
   testWidgets('surcharges : calibre par défaut puis K manuel', (tester) async {
     await _ouvrir(tester, const Size(1400, 1000));
@@ -278,8 +296,11 @@ void main() {
       (tester) async {
     const rubriques = ['CIRCUITS', 'COURT-CIRCUIT', 'PROTECTION', 'RÉFÉRENCES'];
     const entrees = [
+      'Bilan de puissance',
       'Chute de tension',
+      'Compensation réactive',
       'Contrainte thermique',
+      "Courant d'emploi",
       'Surcharges',
       'Ik max',
       'Ik min',
@@ -287,6 +308,7 @@ void main() {
       'Contacts indirects',
       'Filiation',
       'Pouvoir de coupure',
+      'Protection TT par DDR',
       'Résistance du PE',
       'Influences externes',
     ];
@@ -303,7 +325,7 @@ void main() {
     expect([for (final t in textes) if (rubriques.contains(t)) t], rubriques);
     expect([for (final t in textes) if (entrees.contains(t)) t], entrees);
     // Ordre complet : chaque rubrique est suivie de ses entrées.
-    expect(textes.indexOf('CIRCUITS'), lessThan(textes.indexOf('Chute de tension')));
+    expect(textes.indexOf('CIRCUITS'), lessThan(textes.indexOf('Bilan de puissance')));
     expect(textes.indexOf('Surcharges'), lessThan(textes.indexOf('COURT-CIRCUIT')));
     expect(textes.indexOf('Résistance du PE'),
         lessThan(textes.indexOf('RÉFÉRENCES')));
@@ -348,20 +370,25 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('téléphone : menu latéral, 11 écrans sans débordement',
+  testWidgets('téléphone : menu latéral, 15 écrans sans débordement',
       (tester) async {
     await _ouvrir(tester, const Size(390, 844));
 
     expect(find.byKey(const ValueKey('menu-lateral')), findsNothing);
     expect(find.byType(NavigationBar), findsNothing);
-    for (var i = 0; i < 11; i++) {
+    for (var i = 0; i < 15; i++) {
       // Ouvre le menu depuis le bandeau de l'écran affiché, puis choisit l'écran i.
       await tester.tap(find.byTooltip('Menu').first);
       await tester.pumpAndSettle();
-      final destinations = find.descendant(
-          of: find.byType(Drawer), matching: find.byType(ListTile));
-      expect(destinations, findsNWidgets(11));
-      await tester.tap(destinations.at(i));
+      await tester.scrollUntilVisible(
+          find.descendant(
+              of: find.byType(Drawer),
+              matching: find.text(_libelles[i])),
+          100,
+          scrollable: find.descendant(
+              of: find.byType(Drawer), matching: find.byType(Scrollable)));
+      await tester.tap(find.descendant(
+          of: find.byType(Drawer), matching: find.text(_libelles[i])));
       await tester.pumpAndSettle();
       expect(tester.takeException(), isNull, reason: 'écran $i');
     }
