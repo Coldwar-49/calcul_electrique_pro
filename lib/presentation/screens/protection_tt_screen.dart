@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/calculs/protection_tt.dart';
+import '../../core/donnees/temps_coupure.dart';
 import '../formats.dart';
 import '../providers/protection_tt_provider.dart';
 import '../widgets/carte_section.dart';
@@ -50,6 +51,15 @@ class _Formulaire extends ConsumerWidget {
           options: {for (final t in TensionLimite.values) t: t.libelle},
           onChanged: (v) => n.modifier((x) => x.copyWith(limite: v)),
         ),
+        ChampNombre(
+          key: const ValueKey('tt-u0'),
+          label: 'Tension simple U0',
+          suffixe: 'V',
+          valeurInitiale: fmtCompact(e.u0),
+          minimum: 1,
+          aide: 'Sert au temps de coupure maximal (tableau 41.1).',
+          onValide: (v) => n.modifier((x) => x.copyWith(u0: v)),
+        ),
         _ChampResistance(valeur: e.resistanceTerre, notifier: n),
       ]),
     );
@@ -92,6 +102,7 @@ class _Resultat extends ConsumerWidget {
     final r = ref.watch(protectionTTResultatProvider);
     final e = ref.watch(protectionTTEntreeProvider);
     final c = r.conforme;
+    final tCoupure = tempsCoupureMax(e.u0, SchemaTemps.tt);
     return PanneauResultat(
       libelle: 'Résistance de terre maximale Ra',
       valeur: fmt(r.resistanceMax),
@@ -107,8 +118,15 @@ class _Resultat extends ConsumerWidget {
               ? 'Conforme : Ra × IΔn = ${fmt(r.tensionDeContact!)} V'
               : 'Non conforme : Ra × IΔn = ${fmt(r.tensionDeContact!)} V '
                   '> ${fmtCompact(e.limite.volts)} V',
-      pied: 'Ra × IΔn ≤ UL. Valeurs UL à confirmer dans l\'article de la '
-          'NF C 15-100 sur la protection par DDR en TT (hors classeur).',
+      details: [
+        if (tCoupure != null)
+          LigneDetail('Temps de coupure maximal (tableau 41.1, TT)',
+              '${fmtCompact(tCoupure)} s'),
+      ],
+      pied: 'Ra × IΔn ≤ UL (NF C 15-100-1 2024, art. 411.5.3 : UL = 50 V). '
+          'Valeur de 25 V pour les locaux particuliers : à confirmer dans la '
+          'partie concernée. Si Ra est inconnue, elle peut être remplacée par '
+          'l\'impédance de boucle Zs.',
     );
   }
 }

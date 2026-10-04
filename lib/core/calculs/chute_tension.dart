@@ -46,6 +46,16 @@ double seuilChuteTension(Tarif tarif, UsageCircuit usage) =>
       (Tarif.vert, UsageCircuit.force) => 0.08,
     };
 
+/// Majoration du seuil pour de grandes longueurs (NF C 15-100-1 2024, tableau
+/// 52.23) : 0,005 % par mètre de canalisation principale au-delà de 100 m,
+/// sans dépasser 0,5 %. Retourne une fraction de U0 (0,005 = 0,5 %).
+double majorationSeuilLongueur(double longueurPrincipale) {
+  final surplus = longueurPrincipale - 100;
+  if (surplus <= 0) return 0;
+  final m = surplus * 0.00005;
+  return m > 0.005 ? 0.005 : m;
+}
+
 class LigneChuteTension {
   const LigneChuteTension({
     this.circuit = SchemaCircuit.triphaseEquilibre,
@@ -82,19 +92,18 @@ class LigneChuteTension {
     double? ib,
     Tarif? tarif,
     UsageCircuit? usage,
-  }) =>
-      LigneChuteTension(
-        circuit: circuit ?? this.circuit,
-        u0: u0 ?? this.u0,
-        section: section ?? this.section,
-        nbConducteursParPole: nbConducteursParPole ?? this.nbConducteursParPole,
-        longueur: longueur ?? this.longueur,
-        ame: ame ?? this.ame,
-        cosPhi: cosPhi ?? this.cosPhi,
-        ib: ib ?? this.ib,
-        tarif: tarif ?? this.tarif,
-        usage: usage ?? this.usage,
-      );
+  }) => LigneChuteTension(
+    circuit: circuit ?? this.circuit,
+    u0: u0 ?? this.u0,
+    section: section ?? this.section,
+    nbConducteursParPole: nbConducteursParPole ?? this.nbConducteursParPole,
+    longueur: longueur ?? this.longueur,
+    ame: ame ?? this.ame,
+    cosPhi: cosPhi ?? this.cosPhi,
+    ib: ib ?? this.ib,
+    tarif: tarif ?? this.tarif,
+    usage: usage ?? this.usage,
+  );
 }
 
 class ResultatChuteTension {
@@ -133,22 +142,32 @@ double chuteTensionTroncon(LigneChuteTension l) {
 }
 
 /// Calcule chaque tronçon avec le cumul des tronçons précédents.
+///
+/// [majorerSeuilLongueur] : applique au seuil la majoration du tableau 52.23
+/// selon la longueur totale des tronçons (canalisations principales).
 List<ResultatChuteTension> calculerChuteTension(
-    List<LigneChuteTension> lignes) {
+  List<LigneChuteTension> lignes, {
+  bool majorerSeuilLongueur = false,
+}) {
   final resultats = <ResultatChuteTension>[];
+  final majoration = majorerSeuilLongueur
+      ? majorationSeuilLongueur(lignes.fold(0.0, (s, l) => s + l.longueur))
+      : 0.0;
   var cumul = 0.0;
   for (final l in lignes) {
     final du = chuteTensionTroncon(l);
     cumul += du;
     final ratio = cumul / l.u0;
-    final seuil = seuilChuteTension(l.tarif, l.usage);
-    resultats.add(ResultatChuteTension(
-      deltaU: du,
-      cumulV: cumul,
-      ratio: ratio,
-      seuil: seuil,
-      conforme: ratio <= seuil,
-    ));
+    final seuil = seuilChuteTension(l.tarif, l.usage) + majoration;
+    resultats.add(
+      ResultatChuteTension(
+        deltaU: du,
+        cumulV: cumul,
+        ratio: ratio,
+        seuil: seuil,
+        conforme: ratio <= seuil,
+      ),
+    );
   }
   return resultats;
 }

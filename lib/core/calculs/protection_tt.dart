@@ -1,7 +1,8 @@
 /// Protection contre les contacts indirects en schéma TT par DDR :
 /// Ra × IΔn ≤ UL, d'où Ra max = UL / IΔn.
-/// UL = 50 V en général, 25 V dans certains locaux (valeurs à confirmer dans
-/// l'article de la NF C 15-100 sur la protection par DDR en TT).
+/// UL = 50 V (NF C 15-100-1, 2024, art. 411.5.3). 25 V pour des locaux
+/// particuliers : valeur non retrouvée dans la partie 4-41, à confirmer dans la
+/// partie concernée.
 library;
 
 enum TensionLimite {

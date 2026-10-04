@@ -6,6 +6,7 @@ import '../../core/donnees/calibres.dart';
 import '../../core/donnees/courbes_disjoncteurs.dart';
 import '../../core/donnees/fusibles.dart';
 import '../../core/donnees/sections_resistivites.dart';
+import '../../core/donnees/temps_coupure.dart';
 import '../../core/donnees/types.dart';
 import '../formats.dart';
 import '../providers/contacts_indirects_provider.dart';
@@ -313,6 +314,11 @@ class _Resultat extends ConsumerWidget {
         );
 
     String m(double v) => fmt(v, 1);
+    // Tableau 41.1 : U0 = tension simple (en ITSN, tension entre phases / √3).
+    final u0 = e.regime == RegimeNeutre.itsn
+        ? e.tensionPhPh / 1.732
+        : e.tensionPhN;
+    final tCoupure = tempsCoupureMax(u0, SchemaTemps.tn);
 
     return PanneauResultat(
       libelle: coef == null
@@ -326,6 +332,9 @@ class _Resultat extends ConsumerWidget {
               '${m(l.pour(e.regime) * coef)} m'),
         if (coef != null)
           LigneDetail('Coefficient de distribution', fmtCompact(coef)),
+        if (tCoupure != null)
+          LigneDetail('Temps de coupure maximal (tableau 41.1, TN)',
+              '${fmtCompact(tCoupure)} s'),
       ],
       extra: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,

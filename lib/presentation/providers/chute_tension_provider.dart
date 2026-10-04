@@ -37,10 +37,25 @@ class TronconsNotifier extends Notifier<List<TronconUi>> {
 final tronconsProvider =
     NotifierProvider<TronconsNotifier, List<TronconUi>>(TronconsNotifier.new);
 
+/// Majoration du seuil au-delà de 100 m de canalisations principales
+/// (tableau 52.23 de la NF C 15-100-1 : 2024) : désactivée au départ.
+class MajorationLongueurNotifier extends Notifier<bool> {
+  @override
+  bool build() => false;
+
+  void choisir(bool v) => state = v;
+}
+
+final majorationLongueurProvider =
+    NotifierProvider<MajorationLongueurNotifier, bool>(
+        MajorationLongueurNotifier.new);
+
 final chuteTensionResultatsProvider =
     Provider<List<ResultatChuteTension>>((ref) {
   final troncons = ref.watch(tronconsProvider);
   final tarif = ref.watch(tarifProvider);
   return calculerChuteTension(
-      [for (final t in troncons) t.ligne.copyWith(tarif: tarif)]);
+    [for (final t in troncons) t.ligne.copyWith(tarif: tarif)],
+    majorerSeuilLongueur: ref.watch(majorationLongueurProvider),
+  );
 });

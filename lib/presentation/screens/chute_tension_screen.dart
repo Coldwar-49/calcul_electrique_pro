@@ -39,10 +39,26 @@ class _ListeTroncons extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        const CarteSection(
+        CarteSection(
           titre: 'Alimentation',
           icone: Icons.receipt_long_outlined,
-          child: GrilleChamps(children: [SelecteurTarif()]),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const GrilleChamps(children: [SelecteurTarif()]),
+              SwitchListTile(
+                contentPadding: EdgeInsets.zero,
+                title: const Text('Majorer le seuil au-delà de 100 m'),
+                subtitle: const Text(
+                    '+ 0,005 % par mètre de canalisation principale au-delà '
+                    'de 100 m (total des tronçons), plafonné à + 0,5 % : '
+                    'tableau 52.23, NF C 15-100-1 (2024).'),
+                value: ref.watch(majorationLongueurProvider),
+                onChanged: (v) =>
+                    ref.read(majorationLongueurProvider.notifier).choisir(v),
+              ),
+            ],
+          ),
         ),
         const SizedBox(height: 16),
         for (var i = 0; i < troncons.length; i++) ...[

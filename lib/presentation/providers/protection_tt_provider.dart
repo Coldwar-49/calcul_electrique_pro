@@ -7,8 +7,10 @@ class ProtectionTTEntree {
     this.sensibiliteMa = 30,
     this.limite = TensionLimite.v50,
     this.resistanceTerre,
+    this.u0 = 230,
   });
 
+  final double u0;
   final double sensibiliteMa;
   final TensionLimite limite;
   final double? resistanceTerre;
@@ -17,9 +19,11 @@ class ProtectionTTEntree {
     double? sensibiliteMa,
     TensionLimite? limite,
     double? resistanceTerre,
+    double? u0,
     bool effacerResistance = false,
   }) =>
       ProtectionTTEntree(
+        u0: u0 ?? this.u0,
         sensibiliteMa: sensibiliteMa ?? this.sensibiliteMa,
         limite: limite ?? this.limite,
         resistanceTerre:
