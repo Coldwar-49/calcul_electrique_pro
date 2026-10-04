@@ -22,7 +22,9 @@ class EnTetePage extends StatelessWidget {
     return Container(
       width: double.infinity,
       padding: EdgeInsets.symmetric(
-          horizontal: compact ? 16 : 32, vertical: compact ? 16 : 24),
+        horizontal: compact ? 16 : 32,
+        vertical: compact ? 16 : 24,
+      ),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
@@ -59,17 +61,21 @@ class EnTetePage extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(titre,
-                      style: (compact
-                              ? texte.titleLarge
-                              : texte.headlineSmall)
-                          ?.copyWith(
-                              color: cs.onPrimary,
-                              fontWeight: FontWeight.w700)),
+                  Text(
+                    titre,
+                    style: (compact ? texte.titleLarge : texte.headlineSmall)
+                        ?.copyWith(
+                          color: cs.onPrimary,
+                          fontWeight: FontWeight.w700,
+                        ),
+                  ),
                   const SizedBox(height: 2),
-                  Text(sousTitre,
-                      style: texte.bodyMedium?.copyWith(
-                          color: cs.onPrimary.withValues(alpha: 0.85))),
+                  Text(
+                    sousTitre,
+                    style: texte.bodyMedium?.copyWith(
+                      color: cs.onPrimary.withValues(alpha: 0.85),
+                    ),
+                  ),
                 ],
               ),
             ),

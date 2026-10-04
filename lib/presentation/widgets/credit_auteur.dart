@@ -10,10 +10,8 @@ class CreditAuteur extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
-    final style = Theme.of(context).textTheme.labelSmall?.copyWith(
-          color: cs.onSurfaceVariant,
-          fontSize: etroit ? 10 : null,
-        );
+    final style = Theme.of(context).textTheme.labelSmall
+        ?.copyWith(color: cs.onSurfaceVariant, fontSize: etroit ? 10 : null);
     return Text(
       etroit ? 'Créé par\nDevismes\nFabrice' : 'Créé par Devismes Fabrice',
       textAlign: etroit ? TextAlign.center : TextAlign.start,

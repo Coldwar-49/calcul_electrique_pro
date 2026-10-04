@@ -1,3 +1,5 @@
+import 'dart:ui' show PointerDeviceKind;
+
 import 'package:calcul_electrique_pro/main.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -75,6 +77,21 @@ void main() {
     // 10 kA : T = 0,0523 s.
     expect(find.text('0,0523'), findsOneWidget);
     expect(find.text('Conforme (T ≤ 5 s)'), findsOneWidget);
+  });
+
+  testWidgets('bulle d\'aide : survol de « Pcc amont » dans Ik max',
+      (tester) async {
+    await _ouvrir(tester, const Size(1400, 1100));
+    await tester.tap(find.text('Ik max').first);
+    await tester.pumpAndSettle();
+
+    final souris = await tester.createGesture(kind: PointerDeviceKind.mouse);
+    await souris.addPointer(location: Offset.zero);
+    addTearDown(souris.removePointer);
+    await souris.moveTo(tester.getCenter(find.text('Pcc amont').first));
+    await tester.pump(const Duration(seconds: 1));
+    expect(find.textContaining('Puissance de court-circuit du réseau'),
+        findsOneWidget);
   });
 
   testWidgets('Ik max : TGBT du cas de référence', (tester) async {

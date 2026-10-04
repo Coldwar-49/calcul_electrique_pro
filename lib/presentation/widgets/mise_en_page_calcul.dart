@@ -30,46 +30,48 @@ class MiseEnPageCalcul extends StatelessWidget {
       children: [
         EnTetePage(titre: titre, sousTitre: sousTitre, icone: icone),
         Expanded(
-          child: LayoutBuilder(builder: (context, c) {
-            if (c.maxWidth >= largeurEcranLarge) {
-              return Center(
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 1280),
-                  child: Padding(
-                    padding: const EdgeInsets.all(24),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Expanded(
-                          flex: 3,
-                          child: SingleChildScrollView(
-                            padding: const EdgeInsets.only(right: 12),
-                            child: formulaire,
+          child: LayoutBuilder(
+            builder: (context, c) {
+              if (c.maxWidth >= largeurEcranLarge) {
+                return Center(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 1280),
+                    child: Padding(
+                      padding: const EdgeInsets.all(24),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            flex: 3,
+                            child: SingleChildScrollView(
+                              padding: const EdgeInsets.only(right: 12),
+                              child: formulaire,
+                            ),
                           ),
-                        ),
-                        const SizedBox(width: 24),
-                        SizedBox(
-                          width: 380,
-                          child: SingleChildScrollView(child: resultat),
-                        ),
-                      ],
+                          const SizedBox(width: 24),
+                          SizedBox(
+                            width: 380,
+                            child: SingleChildScrollView(child: resultat),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                ),
+                );
+              }
+              return ListView(
+                padding: const EdgeInsets.all(16),
+                children: [
+                  resultat,
+                  const SizedBox(height: 16),
+                  formulaire,
+                  const SizedBox(height: 20),
+                  const Center(child: CreditAuteur()),
+                  const SizedBox(height: 8),
+                ],
               );
-            }
-            return ListView(
-              padding: const EdgeInsets.all(16),
-              children: [
-                resultat,
-                const SizedBox(height: 16),
-                formulaire,
-                const SizedBox(height: 20),
-                const Center(child: CreditAuteur()),
-                const SizedBox(height: 8),
-              ],
-            );
-          }),
+            },
+          ),
         ),
       ],
     );

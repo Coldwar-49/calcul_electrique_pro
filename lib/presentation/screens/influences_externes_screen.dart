@@ -45,6 +45,8 @@ class _Formulaire extends ConsumerWidget {
             ListeDeroulante<int>(
               label: '$code — ${glossaireInfluences[code]!.titre}',
               valeur: niveaux[code]!,
+              info: 'Influence externe $code : choisir le niveau qui décrit les '
+                  'conditions du local ou de l\'emplacement.',
               options: {
                 for (var i = 0; i < glossaireInfluences[code]!.niveaux.length; i++)
                   i + 1: '$code${i + 1} — ${glossaireInfluences[code]!.niveaux[i]}',

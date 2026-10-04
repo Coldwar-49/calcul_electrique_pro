@@ -31,20 +31,20 @@ class PanneauResultat extends StatelessWidget {
     final texte = Theme.of(context).textTheme;
     final (fond, premierPlan, icone) = switch (statut) {
       StatutResultat.neutre => (
-          cs.primaryContainer,
-          cs.onPrimaryContainer,
-          Icons.bolt_rounded
-        ),
+        cs.primaryContainer,
+        cs.onPrimaryContainer,
+        Icons.bolt_rounded,
+      ),
       StatutResultat.conforme => (
-          const Color(0xFFD7F5DD),
-          const Color(0xFF0B5B22),
-          Icons.check_circle_rounded
-        ),
+        const Color(0xFFD7F5DD),
+        const Color(0xFF0B5B22),
+        Icons.check_circle_rounded,
+      ),
       StatutResultat.nonConforme => (
-          cs.errorContainer,
-          cs.onErrorContainer,
-          Icons.error_rounded
-        ),
+        cs.errorContainer,
+        cs.onErrorContainer,
+        Icons.error_rounded,
+      ),
     };
 
     return Card(
@@ -67,10 +67,13 @@ class PanneauResultat extends StatelessWidget {
                       Icon(icone, color: premierPlan, size: 20),
                       const SizedBox(width: 8),
                       Expanded(
-                        child: Text(libelle,
-                            style: texte.labelLarge?.copyWith(
-                                color: premierPlan,
-                                fontWeight: FontWeight.w600)),
+                        child: Text(
+                          libelle,
+                          style: texte.labelLarge?.copyWith(
+                            color: premierPlan,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
                       ),
                     ],
                   ),
@@ -83,25 +86,32 @@ class PanneauResultat extends StatelessWidget {
                         child: FittedBox(
                           fit: BoxFit.scaleDown,
                           alignment: Alignment.centerLeft,
-                          child: Text(valeur,
-                              style: texte.displayMedium?.copyWith(
-                                  color: premierPlan,
-                                  fontWeight: FontWeight.w700)),
+                          child: Text(
+                            valeur,
+                            style: texte.displayMedium?.copyWith(
+                              color: premierPlan,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
                         ),
                       ),
                       if (unite != null) ...[
                         const SizedBox(width: 6),
-                        Text(unite!,
-                            style: texte.titleLarge?.copyWith(
-                                color: premierPlan.withValues(alpha: 0.8))),
+                        Text(
+                          unite!,
+                          style: texte.titleLarge?.copyWith(
+                            color: premierPlan.withValues(alpha: 0.8),
+                          ),
+                        ),
                       ],
                     ],
                   ),
                   if (messageStatut != null) ...[
                     const SizedBox(height: 8),
-                    Text(messageStatut!,
-                        style: texte.bodyMedium
-                            ?.copyWith(color: premierPlan)),
+                    Text(
+                      messageStatut!,
+                      style: texte.bodyMedium?.copyWith(color: premierPlan),
+                    ),
                   ],
                 ],
               ),
@@ -115,27 +125,31 @@ class PanneauResultat extends StatelessWidget {
                   child: Row(
                     children: [
                       Expanded(
-                        child: Text(details[i].libelle,
-                            style: texte.bodyMedium?.copyWith(
-                                color: cs.onSurfaceVariant)),
+                        child: Text(
+                          details[i].libelle,
+                          style: texte.bodyMedium?.copyWith(
+                            color: cs.onSurfaceVariant,
+                          ),
+                        ),
                       ),
-                      Text(details[i].valeur,
-                          style: texte.titleSmall
-                              ?.copyWith(fontWeight: FontWeight.w600)),
+                      Text(
+                        details[i].valeur,
+                        style: texte.titleSmall?.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
                     ],
                   ),
                 ),
               ],
             ],
-            if (extra != null) ...[
-              const SizedBox(height: 16),
-              extra!,
-            ],
+            if (extra != null) ...[const SizedBox(height: 16), extra!],
             if (pied != null) ...[
               const SizedBox(height: 12),
-              Text(pied!,
-                  style: texte.bodySmall
-                      ?.copyWith(color: cs.onSurfaceVariant)),
+              Text(
+                pied!,
+                style: texte.bodySmall?.copyWith(color: cs.onSurfaceVariant),
+              ),
             ],
           ],
         ),

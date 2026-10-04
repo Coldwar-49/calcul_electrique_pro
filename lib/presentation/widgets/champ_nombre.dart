@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../aide_champs.dart';
+import 'info_bulle.dart';
+
 /// Champ numérique (virgule ou point). N'appelle [onValide] que si la valeur
 /// est valide, sinon affiche une erreur et conserve la dernière valeur.
 class ChampNombre extends StatefulWidget {
@@ -13,6 +16,7 @@ class ChampNombre extends StatefulWidget {
     this.maximum,
     this.aide,
     this.suffixe,
+    this.info,
   });
 
   final String label;
@@ -23,6 +27,9 @@ class ChampNombre extends StatefulWidget {
   final double? maximum;
   final String? aide;
   final String? suffixe;
+
+  /// Texte de la bulle d'aide ; par défaut celui du glossaire pour [label].
+  final String? info;
 
   @override
   State<ChampNombre> createState() => _ChampNombreState();
@@ -47,17 +54,20 @@ class _ChampNombreState extends State<ChampNombre> {
 
   @override
   Widget build(BuildContext context) {
-    return TextFormField(
-      initialValue: widget.valeurInitiale,
-      keyboardType: const TextInputType.numberWithOptions(decimal: true),
-      decoration: InputDecoration(
-        labelText: widget.label,
-        helperText: widget.aide,
-        helperMaxLines: 2,
-        suffixText: widget.suffixe,
-        errorText: _erreur,
+    return InfoBulle(
+      message: widget.info ?? aidePourLibelle(widget.label),
+      child: TextFormField(
+        initialValue: widget.valeurInitiale,
+        keyboardType: const TextInputType.numberWithOptions(decimal: true),
+        decoration: InputDecoration(
+          labelText: widget.label,
+          helperText: widget.aide,
+          helperMaxLines: 2,
+          suffixText: widget.suffixe,
+          errorText: _erreur,
+        ),
+        onChanged: _changer,
       ),
-      onChanged: _changer,
     );
   }
 }

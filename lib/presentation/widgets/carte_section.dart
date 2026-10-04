@@ -36,11 +36,11 @@ class CarteSection extends StatelessWidget {
                 ),
                 const SizedBox(width: 12),
                 Expanded(
-                  child: Text(titre,
-                      style: Theme.of(context)
-                          .textTheme
-                          .titleMedium
-                          ?.copyWith(fontWeight: FontWeight.w600)),
+                  child: Text(
+                    titre,
+                    style: Theme.of(context).textTheme.titleMedium
+                        ?.copyWith(fontWeight: FontWeight.w600),
+                  ),
                 ),
                 ?action,
               ],
@@ -56,25 +56,32 @@ class CarteSection extends StatelessWidget {
 
 /// Disposition en colonnes qui s'adaptent à la largeur disponible.
 class GrilleChamps extends StatelessWidget {
-  const GrilleChamps({super.key, required this.children, this.largeurMin = 240});
+  const GrilleChamps({
+    super.key,
+    required this.children,
+    this.largeurMin = 240,
+  });
 
   final List<Widget> children;
   final double largeurMin;
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(builder: (context, c) {
-      const espace = 14.0;
-      final colonnes =
-          ((c.maxWidth + espace) / (largeurMin + espace)).floor().clamp(1, 4);
-      final largeur = (c.maxWidth - espace * (colonnes - 1)) / colonnes;
-      return Wrap(
-        spacing: espace,
-        runSpacing: espace,
-        children: [
-          for (final w in children) SizedBox(width: largeur, child: w),
-        ],
-      );
-    });
+    return LayoutBuilder(
+      builder: (context, c) {
+        const espace = 14.0;
+        final colonnes = ((c.maxWidth + espace) / (largeurMin + espace))
+            .floor()
+            .clamp(1, 4);
+        final largeur = (c.maxWidth - espace * (colonnes - 1)) / colonnes;
+        return Wrap(
+          spacing: espace,
+          runSpacing: espace,
+          children: [
+            for (final w in children) SizedBox(width: largeur, child: w),
+          ],
+        );
+      },
+    );
   }
 }
