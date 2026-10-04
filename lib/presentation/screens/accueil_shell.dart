@@ -9,6 +9,7 @@ import 'compensation_screen.dart';
 import 'contacts_indirects_screen.dart';
 import 'contrainte_thermique_screen.dart';
 import 'courant_emploi_screen.dart';
+import 'dimensionnement_screen.dart';
 import 'filiation_screen.dart';
 import 'ik_max_screen.dart';
 import 'ik_min_screen.dart';
@@ -47,6 +48,8 @@ const _groupes = [
         Icons.whatshot, ContrainteThermiqueScreen()),
     _Destination('Courant d\'emploi', Icons.electric_meter_outlined,
         Icons.electric_meter, CourantEmploiScreen()),
+    _Destination('Dimensionnement', Icons.auto_fix_high_outlined,
+        Icons.auto_fix_high, DimensionnementScreen()),
     _Destination(
         'Surcharges', Icons.shield_outlined, Icons.shield, SurchargesScreen()),
   ]),

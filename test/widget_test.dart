@@ -301,6 +301,7 @@ void main() {
       'Compensation réactive',
       'Contrainte thermique',
       "Courant d'emploi",
+      'Dimensionnement',
       'Surcharges',
       'Ik max',
       'Ik min',
@@ -315,7 +316,7 @@ void main() {
     final menu = find.byKey(const ValueKey('menu-lateral'));
 
     // Fenêtre large : menu fixe à gauche, rubriques puis entrées.
-    await _ouvrir(tester, const Size(1400, 1000));
+    await _ouvrir(tester, const Size(1400, 1300));
     expect(tester.getTopLeft(menu).dx, 0);
     final textes = [
       for (final t in tester.widgetList<Text>(
@@ -331,7 +332,7 @@ void main() {
         lessThan(textes.indexOf('RÉFÉRENCES')));
 
     // Fenêtre étroite (600 à 900 px) : menu fixe à gauche, icônes seules.
-    await _ouvrir(tester, const Size(700, 1000));
+    await _ouvrir(tester, const Size(700, 1300));
     await tester.pumpAndSettle();
     expect(tester.getTopLeft(menu).dx, 0);
     expect(tester.getSize(menu).width, 80);
