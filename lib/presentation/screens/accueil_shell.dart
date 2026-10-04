@@ -38,57 +38,120 @@ class _Groupe {
 /// alphabétique dans chaque rubrique. Pour ajouter un calcul : une ligne ici.
 const _groupes = [
   _Groupe('Circuits', [
-    _Destination('Bilan de puissance', Icons.calculate_outlined,
-        Icons.calculate, BilanPuissanceScreen()),
-    _Destination('Chute de tension', Icons.trending_down_rounded,
-        Icons.trending_down, ChuteTensionScreen()),
-    _Destination('Compensation réactive', Icons.battery_charging_full_outlined,
-        Icons.battery_charging_full, CompensationScreen()),
-    _Destination('Contrainte thermique', Icons.whatshot_outlined,
-        Icons.whatshot, ContrainteThermiqueScreen()),
-    _Destination('Courant d\'emploi', Icons.electric_meter_outlined,
-        Icons.electric_meter, CourantEmploiScreen()),
-    _Destination('Dimensionnement', Icons.auto_fix_high_outlined,
-        Icons.auto_fix_high, DimensionnementScreen()),
     _Destination(
-        'Surcharges', Icons.shield_outlined, Icons.shield, SurchargesScreen()),
+      'Bilan de puissance',
+      Icons.calculate_outlined,
+      Icons.calculate,
+      BilanPuissanceScreen(),
+    ),
+    _Destination(
+      'Chute de tension',
+      Icons.trending_down_rounded,
+      Icons.trending_down,
+      ChuteTensionScreen(),
+    ),
+    _Destination(
+      'Compensation réactive',
+      Icons.battery_charging_full_outlined,
+      Icons.battery_charging_full,
+      CompensationScreen(),
+    ),
+    _Destination(
+      'Contrainte thermique',
+      Icons.whatshot_outlined,
+      Icons.whatshot,
+      ContrainteThermiqueScreen(),
+    ),
+    _Destination(
+      'Courant d\'emploi',
+      Icons.electric_meter_outlined,
+      Icons.electric_meter,
+      CourantEmploiScreen(),
+    ),
+    _Destination(
+      'Dimensionnement',
+      Icons.auto_fix_high_outlined,
+      Icons.auto_fix_high,
+      DimensionnementScreen(),
+    ),
+    _Destination(
+      'Surcharges',
+      Icons.shield_outlined,
+      Icons.shield,
+      SurchargesScreen(),
+    ),
   ]),
   _Groupe('Court-circuit', [
     _Destination(
-        'Ik max', Icons.flash_on_outlined, Icons.flash_on, IkMaxScreen()),
+      'Ik max',
+      Icons.flash_on_outlined,
+      Icons.flash_on,
+      IkMaxScreen(),
+    ),
     _Destination(
-        'Ik min', Icons.flash_off_outlined, Icons.flash_off, IkMinScreen()),
-    _Destination('Règle du triangle', Icons.change_history_outlined,
-        Icons.change_history, RegleTriangleScreen()),
+      'Ik min',
+      Icons.flash_off_outlined,
+      Icons.flash_off,
+      IkMinScreen(),
+    ),
+    _Destination(
+      'Règle du triangle',
+      Icons.change_history_outlined,
+      Icons.change_history,
+      RegleTriangleScreen(),
+    ),
   ]),
   _Groupe('Protection', [
-    _Destination('Contacts indirects', Icons.back_hand_outlined,
-        Icons.back_hand, ContactsIndirectsScreen()),
-    _Destination('Filiation', Icons.account_tree_outlined,
-        Icons.account_tree, FiliationScreen()),
-    _Destination('Pouvoir de coupure', Icons.shield_moon_outlined,
-        Icons.shield_moon, PouvoirDeCoupureScreen()),
-    _Destination('Protection TT par DDR', Icons.electrical_services_outlined,
-        Icons.electrical_services, ProtectionTTScreen()),
-    _Destination('Résistance du PE', Icons.vertical_align_bottom_outlined,
-        Icons.vertical_align_bottom, ResistancePeScreen()),
+    _Destination(
+      'Contacts indirects',
+      Icons.back_hand_outlined,
+      Icons.back_hand,
+      ContactsIndirectsScreen(),
+    ),
+    _Destination(
+      'Filiation',
+      Icons.account_tree_outlined,
+      Icons.account_tree,
+      FiliationScreen(),
+    ),
+    _Destination(
+      'Pouvoir de coupure',
+      Icons.shield_moon_outlined,
+      Icons.shield_moon,
+      PouvoirDeCoupureScreen(),
+    ),
+    _Destination(
+      'Protection TT par DDR',
+      Icons.electrical_services_outlined,
+      Icons.electrical_services,
+      ProtectionTTScreen(),
+    ),
+    _Destination(
+      'Résistance du PE',
+      Icons.vertical_align_bottom_outlined,
+      Icons.vertical_align_bottom,
+      ResistancePeScreen(),
+    ),
   ]),
   _Groupe('Références', [
-    _Destination('Influences externes', Icons.water_drop_outlined,
-        Icons.water_drop, InfluencesExternesScreen()),
+    _Destination(
+      'Influences externes',
+      Icons.water_drop_outlined,
+      Icons.water_drop,
+      InfluencesExternesScreen(),
+    ),
   ]),
 ];
 
 /// Toutes les entrées dans l'ordre du menu (l'indice sert à la navigation).
-final _destinations = <_Destination>[
-  for (final g in _groupes) ...g.entrees,
-];
+final _destinations = <_Destination>[for (final g in _groupes) ...g.entrees];
 
 final _pages = <Widget>[for (final d in _destinations) d.page];
 
 /// L'application s'ouvre sur « Surcharges », le calcul principal.
-final int _indexAccueil =
-    _destinations.indexWhere((d) => d.libelle == 'Surcharges');
+final int _indexAccueil = _destinations.indexWhere(
+  (d) => d.libelle == 'Surcharges',
+);
 
 /// Coque de l'application : menu fixe à gauche dès 600 px de large (icônes
 /// seules sous 900 px, avec les libellés au-delà), menu coulissant sur
@@ -151,7 +214,7 @@ class AccueilShell extends ConsumerWidget {
 
 /// Menu à rubriques : marque en haut, entrées défilantes, crédit toujours
 /// visible en bas.
-class _MenuLateral extends StatelessWidget {
+class _MenuLateral extends StatefulWidget {
   const _MenuLateral({
     required this.index,
     required this.compact,
@@ -165,7 +228,34 @@ class _MenuLateral extends StatelessWidget {
   final ValueChanged<int> onSelect;
 
   @override
+  State<_MenuLateral> createState() => _MenuLateralState();
+}
+
+/// Indice de la rubrique qui contient l'entrée [index].
+int _groupeDe(int index) {
+  var debut = 0;
+  for (var g = 0; g < _groupes.length; g++) {
+    debut += _groupes[g].entrees.length;
+    if (index < debut) return g;
+  }
+  return 0;
+}
+
+class _MenuLateralState extends State<_MenuLateral> {
+  /// Rubriques dépliées : au départ, celle de l'écran affiché.
+  late final Set<int> _ouvertes = {_groupeDe(widget.index)};
+
+  @override
+  void didUpdateWidget(_MenuLateral ancien) {
+    super.didUpdateWidget(ancien);
+    if (widget.index != ancien.index) _ouvertes.add(_groupeDe(widget.index));
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final index = widget.index;
+    final compact = widget.compact;
+    final onSelect = widget.onSelect;
     final cs = Theme.of(context).colorScheme;
     final texte = Theme.of(context).textTheme;
 
@@ -178,35 +268,66 @@ class _MenuLateral extends StatelessWidget {
           elements.add(const Divider(indent: 16, endIndent: 16, height: 16));
         }
       } else {
-        elements.add(Padding(
-          padding: EdgeInsets.fromLTRB(16, g == 0 ? 4 : 20, 16, 6),
-          child: Text(
-            groupe.titre.toUpperCase(),
-            style: texte.labelSmall?.copyWith(
-              color: cs.onSurfaceVariant,
-              fontWeight: FontWeight.w700,
-              letterSpacing: 0.8,
+        final ouverte = _ouvertes.contains(g);
+        elements.add(
+          InkWell(
+            borderRadius: BorderRadius.circular(12),
+            onTap: () => setState(
+              () => ouverte ? _ouvertes.remove(g) : _ouvertes.add(g),
+            ),
+            child: Padding(
+              padding: EdgeInsets.fromLTRB(16, g == 0 ? 4 : 10, 8, 6),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      groupe.titre.toUpperCase(),
+                      style: texte.labelSmall?.copyWith(
+                        color: cs.onSurfaceVariant,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 0.8,
+                      ),
+                    ),
+                  ),
+                  Icon(
+                    ouverte ? Icons.expand_less : Icons.expand_more,
+                    size: 20,
+                    color: cs.onSurfaceVariant,
+                  ),
+                ],
+              ),
             ),
           ),
-        ));
+        );
       }
       for (final d in groupe.entrees) {
         final indice = i++;
+        if (!compact && !_ouvertes.contains(g)) continue;
         final actif = indice == index;
-        elements.add(compact
-            ? _EntreeCompacte(
-                destination: d, actif: actif, onTap: () => onSelect(indice))
-            : ListTile(
-                dense: true,
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(28)),
-                selected: actif,
-                selectedTileColor: cs.primaryContainer,
-                leading: Icon(actif ? d.iconeActive : d.icone),
-                title: Text(d.libelle,
-                    maxLines: 1, overflow: TextOverflow.ellipsis),
-                onTap: () => onSelect(indice),
-              ));
+        elements.add(
+          compact
+              ? _EntreeCompacte(
+                  destination: d,
+                  actif: actif,
+                  onTap: () => onSelect(indice),
+                )
+              : ListTile(
+                  dense: true,
+                  visualDensity: const VisualDensity(vertical: -2),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(28),
+                  ),
+                  selected: actif,
+                  selectedTileColor: cs.primaryContainer,
+                  leading: Icon(actif ? d.iconeActive : d.icone),
+                  title: Text(
+                    d.libelle,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  onTap: () => onSelect(indice),
+                ),
+        );
       }
     }
 
@@ -294,13 +415,13 @@ class _Marque extends StatelessWidget {
                 logo,
                 const SizedBox(width: 12),
                 Flexible(
-                  child: Text('Calcul Électrique Pro',
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: Theme.of(context)
-                          .textTheme
-                          .titleSmall
-                          ?.copyWith(fontWeight: FontWeight.w700)),
+                  child: Text(
+                    'Calcul Électrique Pro',
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: Theme.of(context).textTheme.titleSmall
+                        ?.copyWith(fontWeight: FontWeight.w700),
+                  ),
                 ),
               ],
             )

@@ -5,11 +5,37 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-Future<void> _ouvrir(WidgetTester tester, Size taille) async {
+/// Ouvre l'application. [deplier] : déplie toutes les rubriques du menu fixe
+/// (elles sont repliées au départ, sauf celle de l'écran affiché).
+Future<void> _ouvrir(WidgetTester tester, Size taille,
+    {bool deplier = true}) async {
   tester.view.physicalSize = taille;
   tester.view.devicePixelRatio = 1;
   addTearDown(tester.view.reset);
   await tester.pumpWidget(const ProviderScope(child: CalculElectriqueApp()));
+  if (!deplier) return;
+  for (final r in ['COURT-CIRCUIT', 'PROTECTION', 'RÉFÉRENCES']) {
+    final titre = find.text(r);
+    if (titre.evaluate().isEmpty) continue;
+    await tester.tap(titre);
+    await tester.pumpAndSettle();
+  }
+}
+
+/// Déplie les rubriques du menu [dans] (liste défilante : fait défiler
+/// jusqu'à chaque titre avant de le toucher).
+Future<void> _deplierToutes(WidgetTester tester, Finder dans) async {
+  for (final r in ['COURT-CIRCUIT', 'PROTECTION', 'RÉFÉRENCES']) {
+    final titre = find.descendant(of: dans, matching: find.text(r));
+    await tester.scrollUntilVisible(titre, 100,
+        scrollable: find.descendant(of: dans, matching: find.byType(Scrollable)));
+    final entete = find.ancestor(of: titre, matching: find.byType(InkWell)).first;
+    final repliee =
+        find.descendant(of: entete, matching: find.byIcon(Icons.expand_more));
+    if (repliee.evaluate().isEmpty) continue;
+    await tester.tap(titre);
+    await tester.pumpAndSettle();
+  }
 }
 
 const _libelles = [
@@ -18,6 +44,7 @@ const _libelles = [
   'Compensation réactive',
   'Contrainte thermique',
   "Courant d'emploi",
+  'Dimensionnement',
   'Surcharges',
   'Ik max',
   'Ik min',
@@ -333,8 +360,15 @@ void main() {
     final menu = find.byKey(const ValueKey('menu-lateral'));
 
     // Fenêtre large : menu fixe à gauche, rubriques puis entrées.
-    await _ouvrir(tester, const Size(1400, 1300));
+    await _ouvrir(tester, const Size(1400, 1300), deplier: false);
     expect(tester.getTopLeft(menu).dx, 0);
+    // Au départ seule la rubrique de l'écran affiché (Circuits) est dépliée.
+    expect(find.text('Ik max'), findsNothing);
+    expect(find.text('Surcharges'), findsWidgets);
+    for (final r in rubriques.skip(1)) {
+      await tester.tap(find.text(r));
+      await tester.pumpAndSettle();
+    }
     final textes = [
       for (final t in tester.widgetList<Text>(
           find.descendant(of: menu, matching: find.byType(Text))))
@@ -365,10 +399,11 @@ void main() {
   testWidgets('menu à gauche : défile dans une fenêtre basse, dernière entrée atteignable',
       (tester) async {
     // 1400 x 360 : bien trop bas pour 11 entrées et 4 rubriques.
-    await _ouvrir(tester, const Size(1400, 360));
+    await _ouvrir(tester, const Size(1400, 360), deplier: false);
     expect(tester.takeException(), isNull);
 
     final menu = find.byKey(const ValueKey('menu-lateral'));
+    await _deplierToutes(tester, menu);
     // La dernière entrée n'est pas encore affichée (liste défilante)…
     final derniere =
         find.descendant(of: menu, matching: find.text('Influences externes'));
@@ -388,16 +423,17 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('téléphone : menu latéral, 15 écrans sans débordement',
+  testWidgets('téléphone : menu latéral, 16 écrans sans débordement',
       (tester) async {
-    await _ouvrir(tester, const Size(390, 844));
+    await _ouvrir(tester, const Size(390, 844), deplier: false);
 
     expect(find.byKey(const ValueKey('menu-lateral')), findsNothing);
     expect(find.byType(NavigationBar), findsNothing);
-    for (var i = 0; i < 15; i++) {
+    for (var i = 0; i < _libelles.length; i++) {
       // Ouvre le menu depuis le bandeau de l'écran affiché, puis choisit l'écran i.
       await tester.tap(find.byTooltip('Menu').first);
       await tester.pumpAndSettle();
+      await _deplierToutes(tester, find.byType(Drawer));
       await tester.scrollUntilVisible(
           find.descendant(
               of: find.byType(Drawer),
