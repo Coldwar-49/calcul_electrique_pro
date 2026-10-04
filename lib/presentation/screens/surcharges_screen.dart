@@ -191,8 +191,14 @@ class _AssistantK extends ConsumerWidget {
     final vue = ref.watch(surchargeVueProvider);
 
     final temperature = temperatureEffective(mode, e.isolant, p.temperature);
-    final nbMax = nombreMaxCircuits(mode);
+    final nbMax = nombreMaxCircuits(mode, edition: p.edition);
     final nbCircuits = p.nbCircuits < nbMax ? p.nbCircuits : nbMax;
+
+    // En 2024, le 0,95 « plafond » est inclus dans le tableau 52.12 (point 3) :
+    // on ne le propose plus en K7 pour ne pas le compter deux fois.
+    final k7C = p.edition == EditionNorme.norme2013
+        ? _k7ModeC
+        : {for (final e in _k7ModeC.entries) if (e.key != 0.95) e.key: e.value};
 
     String libelleNb(int i) =>
         (i == nbMax && mode != ModePose.d) ? '$i et plus' : '$i';
@@ -249,8 +255,8 @@ class _AssistantK extends ConsumerWidget {
           if (mode == ModePose.c)
             ListeDeroulante<double>(
               label: 'Coefficient complémentaire K7',
-              valeur: _k7ModeC.containsKey(p.k7) ? p.k7 : 1.0,
-              options: _k7ModeC,
+              valeur: k7C.containsKey(p.k7) ? p.k7 : 1.0,
+              options: k7C,
               onChanged: (v) => n.modifierK((k) => k.copyWith(k7: v)),
             ),
         ]),
@@ -270,13 +276,6 @@ class _AssistantK extends ConsumerWidget {
             p.harmoniquesSup15,
             (v) => n.modifierK((k) => k.copyWith(harmoniquesSup15: v))),
         if (p.harmoniquesSup15) ...[
-          interrupteur(
-              'K5 du classeur 2013 (0,84) au lieu de la norme 2024 (0,86)',
-              p.edition == EditionNorme.norme2013,
-              (v) => n.modifierK((k) => k.copyWith(
-                  edition: v
-                      ? EditionNorme.norme2013
-                      : EditionNorme.normeActuelle))),
           Padding(
             padding: const EdgeInsets.only(bottom: 4),
             child: Text(
@@ -288,6 +287,13 @@ class _AssistantK extends ConsumerWidget {
         ],
         interrupteur('Disposition symétrique (sinon K6 = 0,8)', p.symetrique,
             (v) => n.modifierK((k) => k.copyWith(symetrique: v))),
+        interrupteur(
+            'Coefficients du classeur (2013) pour K2 et K5',
+            p.edition == EditionNorme.norme2013,
+            (v) => n.modifierK((k) => k.copyWith(
+                edition: v
+                    ? EditionNorme.norme2013
+                    : EditionNorme.normeActuelle))),
         if (sol)
           Padding(
             padding: const EdgeInsets.only(top: 4),

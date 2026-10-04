@@ -66,6 +66,9 @@ ResultatDimensionnement dimensionnerCircuit({
       : SchemaCircuit.triphaseEquilibre;
   final candidats = <CandidatSection>[];
   for (final s in sectionsUsuelles) {
+    // Tableau 52.19 (NF C 15-100-1, 2024) : section minimale 1,5 mm² en cuivre,
+    // 10 mm² en aluminium (alimentation et éclairage, installations fixes).
+    if (ame == Ame.aluminium && s < 10) continue;
     final r = calculerSurcharge(
       isolant: isolant,
       circuit: circuit,

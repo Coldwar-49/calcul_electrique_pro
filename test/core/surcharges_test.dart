@@ -129,4 +129,47 @@ void main() {
       expect(calibrePourCourant(1375), 1250);
     });
   });
+
+  group('K2 selon le tableau 52.12 (NF C 15-100-1, 2024)', () {
+    test('méthode B : valeurs tabulées jusqu\'à 9, puis 12, 16, 20', () {
+      const attendu = {
+        1: 1.0, 2: 0.80, 3: 0.70, 4: 0.65, 5: 0.60, 6: 0.57, 7: 0.54,
+        8: 0.52, 9: 0.50, 12: 0.45, 16: 0.41, 20: 0.38,
+      };
+      attendu.forEach((n, k) => expect(k2MethodeB(n), k, reason: 'n=$n'));
+      // Entre deux colonnes : la colonne supérieure (côté sécurité).
+      expect(k2MethodeB(10), 0.45);
+      expect(k2MethodeB(13), 0.41);
+      expect(k2MethodeB(18), 0.38);
+      expect(k2MethodeB(30), 0.38);
+    });
+
+    test('méthode B : le classeur 2013 reste disponible', () {
+      expect(k2MethodeB(6, edition: EditionNorme.norme2013), 0.55);
+      expect(k2MethodeB(8, edition: EditionNorme.norme2013), 0.5);
+      expect(k2MethodeB(13, edition: EditionNorme.norme2013), 0.4);
+      expect(nombreMaxCircuits(ModePose.b), 20);
+      expect(nombreMaxCircuits(ModePose.b, edition: EditionNorme.norme2013), 13);
+    });
+
+    test('méthode C sous plafond : 0,95 0,81 0,76 … (2013 : 1 0,85 0,76 …)', () {
+      expect(k2MethodeC(1, plafond: true), 0.95);
+      expect(k2MethodeC(2, plafond: true), 0.81);
+      expect(k2MethodeC(3, plafond: true), 0.76);
+      expect(k2MethodeC(9, plafond: true), 0.64);
+      expect(k2MethodeC(1, plafond: true, edition: EditionNorme.norme2013), 1);
+      expect(k2MethodeC(2, plafond: true, edition: EditionNorme.norme2013), 0.85);
+      // Sur mur : inchangé.
+      expect(k2MethodeC(2, plafond: false), 0.85);
+    });
+
+    test('K1 (tableaux 52.9 et 52.10) et K3 (52.15) : valeurs identiques', () {
+      expect(k1Temperature(Isolant.pvc, 40), 0.87);
+      expect(k1Temperature(Isolant.pr, 80), 0.41);
+      expect(k1Temperature(Isolant.pvc, 30, sol: true), 0.89);
+      expect(k1Temperature(Isolant.pr, 60, sol: true), 0.65);
+      expect(k3Couches(4), 0.7);
+      expect(k3Couches(9), 0.66);
+    });
+  });
 }

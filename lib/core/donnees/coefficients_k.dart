@@ -55,8 +55,11 @@ List<int> temperaturesDisponibles(Isolant isolant, {bool sol = false}) {
 }
 
 /// Nombre maximal de circuits géré par la table K2 de chaque mode de pose.
-int nombreMaxCircuits(ModePose mode) => switch (mode) {
-      ModePose.b => 13,
+/// En 2024, le tableau 52.12 va jusqu'à 20 circuits pour la méthode B.
+int nombreMaxCircuits(ModePose mode,
+        {EditionNorme edition = EditionNorme.normeActuelle}) =>
+    switch (mode) {
+      ModePose.b => edition == EditionNorme.norme2013 ? 13 : 20,
       ModePose.c => 9,
       ModePose.d => 6,
       ModePose.e || ModePose.f => 8,
@@ -64,9 +67,27 @@ int nombreMaxCircuits(ModePose mode) => switch (mode) {
 
 // ---------------------------------------------------------------- 52N : K2
 
+/// Tableau 52.12 (NF C 15-100-1, 2024), point 1 : facteurs tabulés pour 1 à 9,
+/// 12, 16 et 20 circuits. Entre deux colonnes, la valeur de la colonne
+/// supérieure est retenue (côté sécurité) ; au-delà de 20, celle de 20.
+const Map<int, double> _t5212Groupe = {
+  1: 1.0, 2: 0.80, 3: 0.70, 4: 0.65, 5: 0.60, 6: 0.57, 7: 0.54, 8: 0.52,
+  9: 0.50, 12: 0.45, 16: 0.41, 20: 0.38,
+};
+
 /// K2 méthode B (conduits) : nombre de circuits ou câbles multiconducteurs.
-double k2MethodeB(int nombre) {
+///
+/// 2013 : classeur CLAUREG (valeurs groupées : 6-7 -> 0,55, 8-9 -> 0,5,
+/// 10-12 -> 0,45, 13 et plus -> 0,4). 2024 : tableau 52.12.
+double k2MethodeB(int nombre,
+    {EditionNorme edition = EditionNorme.normeActuelle}) {
   if (nombre < 1) throw ArgumentError('Nombre >= 1 requis');
+  if (edition != EditionNorme.norme2013) {
+    for (final e in _t5212Groupe.entries) {
+      if (nombre <= e.key) return e.value;
+    }
+    return _t5212Groupe[20]!;
+  }
   if (nombre <= 5) return const [1.0, 0.8, 0.7, 0.65, 0.6][nombre - 1];
   if (nombre <= 7) return 0.55;
   if (nombre <= 9) return 0.5;
@@ -75,10 +96,18 @@ double k2MethodeB(int nombre) {
 }
 
 /// K2 méthode C : murs/planchers/tablettes ou plafond.
-double k2MethodeC(int nombre, {required bool plafond}) {
+///
+/// 2024 (tableau 52.12, point 3) : sous plafond 0,95 0,81 0,76 0,72 0,69 0,67
+/// 0,66 0,65 0,64. Le classeur part de 1 et 0,85 et laisse le 0,95 « plafond »
+/// au coefficient complémentaire K7 ; en 2024 ce 0,95 est dans le tableau.
+double k2MethodeC(int nombre,
+    {required bool plafond,
+    EditionNorme edition = EditionNorme.normeActuelle}) {
   if (nombre < 1) throw ArgumentError('Nombre >= 1 requis');
   const mur = [1, 0.85, 0.79, 0.75, 0.73, 0.72, 0.72, 0.71];
-  const plaf = [1, 0.85, 0.76, 0.72, 0.69, 0.67, 0.66, 0.65];
+  const plaf2013 = [1, 0.85, 0.76, 0.72, 0.69, 0.67, 0.66, 0.65];
+  const plaf2024 = [0.95, 0.81, 0.76, 0.72, 0.69, 0.67, 0.66, 0.65];
+  final plaf = edition == EditionNorme.norme2013 ? plaf2013 : plaf2024;
   if (nombre >= 9) return plafond ? 0.64 : 0.7;
   return (plafond ? plaf : mur)[nombre - 1].toDouble();
 }

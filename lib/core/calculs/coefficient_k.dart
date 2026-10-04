@@ -80,9 +80,8 @@ int temperatureEffective(ModePose mode, Isolant isolant, int saisie) {
 /// la table sont ramenés au maximum de la table.
 double coefficientPourMode(ModePose mode, Isolant isolant, ParamsK p) {
   final t = temperatureEffective(mode, isolant, p.temperature);
-  final n = p.nbCircuits < nombreMaxCircuits(mode)
-      ? p.nbCircuits
-      : nombreMaxCircuits(mode);
+  final nbMax = nombreMaxCircuits(mode, edition: p.edition);
+  final n = p.nbCircuits < nbMax ? p.nbCircuits : nbMax;
   return switch (mode) {
     ModePose.b => coefficientMethodeB(
         isolant: isolant,
@@ -103,7 +102,10 @@ double coefficientPourMode(ModePose mode, Isolant isolant, ParamsK p) {
         risqueBe3: p.risqueBe3,
         harmoniquesSup15: p.harmoniquesSup15,
         edition: p.edition,
-        k7: p.k7,
+        // 2024 : le 0,95 « plafond » est déjà dans le tableau 52.12 (point 3).
+        k7: p.edition != EditionNorme.norme2013 && p.k7 == k7MethodeC
+            ? 1
+            : p.k7,
         symetrique: p.symetrique),
     ModePose.d => coefficientMethodeD(
         isolant: isolant,
@@ -139,7 +141,7 @@ double coefficientMethodeB({
   bool symetrique = true,
 }) =>
     k1Temperature(isolant, temperature) *
-    k2MethodeB(nbCircuits) *
+    k2MethodeB(nbCircuits, edition: edition) *
     k3Couches(nbCouches) *
     kRisqueBe3(risqueBe3) *
     kHarmoniques(harmoniquesSup15, edition: edition) *
@@ -160,7 +162,7 @@ double coefficientMethodeC({
   bool symetrique = true,
 }) =>
     k1Temperature(isolant, temperature) *
-    k2MethodeC(nbCircuits, plafond: plafond) *
+    k2MethodeC(nbCircuits, plafond: plafond, edition: edition) *
     k3Couches(nbCouches) *
     kRisqueBe3(risqueBe3) *
     kHarmoniques(harmoniquesSup15, edition: edition) *

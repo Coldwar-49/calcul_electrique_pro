@@ -72,4 +72,22 @@ void main() {
   test('courant démesuré : aucune section ne convient', () {
     expect(_calcul(ib: 5000).retenu, isNull);
   });
+
+  test('aluminium : sections de moins de 10 mm² écartées (tableau 52.19)', () {
+    final r = dimensionnerCircuit(
+      ib: 5,
+      isolant: Isolant.pr,
+      circuit: Circuit.triphase,
+      mode: ModePose.c,
+      ame: Ame.aluminium,
+      coefficientK: 1,
+      longueur: 10,
+      u0: 230,
+      cosPhi: 0.8,
+      tarif: Tarif.bleu,
+      usage: UsageCircuit.force,
+    );
+    expect(r.candidats.first.section, 10);
+    expect(r.candidats.every((c) => c.section >= 10), isTrue);
+  });
 }
