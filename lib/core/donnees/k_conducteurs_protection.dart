@@ -1,10 +1,10 @@
 /// Valeurs de k des conducteurs de protection, NF C 15-100-1 (2024-08),
-/// partie 5-54, tableaux 54A.2A, 54A.2B, 54A.3A, 54A.3B, 54A.4, 54A.6A et
-/// 54A.6B (cuivre et aluminium ; l'acier n'est pas repris).
+/// partie 5-54, tableaux 54A.2A, 54A.2B, 54A.3A, 54A.3B, 54A.4, 54A.5, 54A.6A
+/// et 54A.6B (cuivre et aluminium ; l'acier n'est pas repris). Valeurs
+/// recoupées avec le texte des tableaux collé par l'utilisateur.
 ///
-/// Non repris : tableau 54A.5 (gaine métallique d'un câble), lecture du PDF
-/// ambiguë. Les valeurs de ces tableaux diffèrent de celles du guide UTE
-/// C 15-106 (2003) et du classeur CLAUREG (voir docs/changements_nfc15100.md).
+/// Elles diffèrent de celles du guide UTE C 15-106 (2003) et du classeur
+/// CLAUREG (voir docs/changements_nfc15100.md).
 library;
 
 import 'types.dart';
@@ -34,6 +34,8 @@ enum SituationPe {
   incorpore('Dans le câble ou regroupé avec d\'autres câbles (54A.4)'),
   isoleSepare('Isolé, séparé, non enterré (54A.2A)'),
   isoleSepareEnterre('Isolé, séparé, enterré (54A.2B)'),
+  gaineMetallique(
+      'Gaine métallique d\'un câble : armure, concentrique… (54A.5)'),
   nuSurGaine('Nu, sur la gaine d\'un câble, non enterré (54A.3A)'),
   nuSurGaineEnterre('Nu, sur la gaine d\'un câble, enterré (54A.3B)'),
   nuNonEnterre('Nu, non enterré (54A.6A)'),
@@ -77,6 +79,16 @@ const List<LigneK> _tableau54A2B = [
   LigneK(_sil, 199, 134),
 ];
 
+// Gaine métallique d'un câble utilisée comme conducteur de protection : la
+// ligne désigne l'isolation du câble.
+const List<LigneK> _tableau54A5 = [
+  LigneK(_pvc70, 136, 91),
+  LigneK(_pvc90, 124, 83),
+  LigneK(_epr, 124, 83),
+  LigneK(_cao60, 139, 94),
+  LigneK(_cao85, 135, 91),
+];
+
 // Nature de la gaine du câble avec lequel le conducteur nu est en contact.
 const List<LigneK> _tableau54A3A = [
   LigneK('Gaine PVC', 153, 103),
@@ -107,6 +119,7 @@ List<LigneK> lignesK(SituationPe situation) => switch (situation) {
       SituationPe.incorpore => _tableau54A4,
       SituationPe.isoleSepare => _tableau54A2A,
       SituationPe.isoleSepareEnterre => _tableau54A2B,
+      SituationPe.gaineMetallique => _tableau54A5,
       SituationPe.nuSurGaine => _tableau54A3A,
       SituationPe.nuSurGaineEnterre => _tableau54A3B,
       SituationPe.nuNonEnterre => _tableau54A6A,

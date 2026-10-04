@@ -33,8 +33,11 @@ class SectionPeEntree {
   final double ikKa;
   final double temps;
 
-  /// true : PE hors de la canalisation d'alimentation.
-  bool get horsCanalisation => situation != SituationPe.incorpore;
+  /// true : PE hors de la canalisation d'alimentation (la gaine métallique
+  /// d'un câble en fait partie).
+  bool get horsCanalisation =>
+      situation != SituationPe.incorpore &&
+      situation != SituationPe.gaineMetallique;
 
   SectionPeEntree copyWith({
     double? sectionPhase,

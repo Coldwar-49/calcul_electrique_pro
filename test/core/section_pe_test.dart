@@ -72,6 +72,11 @@ void main() {
     expect(ligneK(SituationPe.nuSurGaineEnterre, 1).k(Ame.aluminium), 94);
     expect(ligneK(SituationPe.nuNonEnterre, 0).k(Ame.cuivre), 220);
     expect(ligneK(SituationPe.nuEnterre, 2).k(Ame.cuivre), 140);
+    // 54A.5 : gaine métallique (cuivre / aluminium).
+    expect(ligneK(SituationPe.gaineMetallique, 0).k(Ame.cuivre), 136);
+    expect(ligneK(SituationPe.gaineMetallique, 1).k(Ame.aluminium), 83);
+    expect(ligneK(SituationPe.gaineMetallique, 3).k(Ame.cuivre), 139);
+    expect(ligneK(SituationPe.gaineMetallique, 4).k(Ame.aluminium), 91);
     // Recoupements entre tableaux (mêmes températures finales).
     expect(ligneK(SituationPe.nuSurGaine, 0).k(Ame.cuivre),
         ligneK(SituationPe.nuNonEnterre, 1).k(Ame.cuivre));
