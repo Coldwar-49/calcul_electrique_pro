@@ -61,7 +61,7 @@ int nombreMaxCircuits(ModePose mode,
     switch (mode) {
       ModePose.b => edition == EditionNorme.norme2013 ? 13 : 20,
       ModePose.c => 9,
-      ModePose.d => 6,
+      ModePose.d => edition == EditionNorme.norme2013 ? 6 : 20,
       ModePose.e || ModePose.f => 8,
     };
 
@@ -215,3 +215,72 @@ double k52t(int nombre) {
 /// K8 de la méthode D : câbles dans conduits, fourreaux ou profilés enterrés.
 /// Dans le classeur, L6 = 0,8 (non symétrique) / 1, et L9 (valeur saisie) = 1.
 double k8MethodeD(bool symetrique) => symetrique ? 1 : 0.8;
+
+// ----------------------------------------- méthode D, norme 2024 (D2)
+
+/// Distance entre câbles directement enterrés (tableau 52.16, 2024).
+enum DistanceEnterre { nulle, undiametre, m0125, m025, m05 }
+
+/// Tableau 52.16 : facteurs de groupement de plusieurs circuits, câbles
+/// directement enterrés (méthode D2). Colonnes : câbles jointifs, un diamètre,
+/// 0,125 m, 0,25 m, 0,5 m. Lignes : 2 à 9, 12, 16 et 20 circuits.
+const Map<int, List<double>> _t5216 = {
+  2: [0.75, 0.80, 0.85, 0.90, 0.90],
+  3: [0.65, 0.70, 0.75, 0.80, 0.85],
+  4: [0.60, 0.60, 0.70, 0.75, 0.80],
+  5: [0.55, 0.55, 0.65, 0.70, 0.80],
+  6: [0.50, 0.55, 0.60, 0.70, 0.80],
+  7: [0.45, 0.51, 0.59, 0.67, 0.76],
+  8: [0.43, 0.48, 0.57, 0.65, 0.75],
+  9: [0.41, 0.46, 0.55, 0.63, 0.74],
+  12: [0.36, 0.42, 0.51, 0.59, 0.71],
+  16: [0.32, 0.38, 0.47, 0.56, 0.68],
+  20: [0.29, 0.35, 0.44, 0.53, 0.66],
+};
+
+/// Groupement de [nombre] circuits enterrés (tableau 52.16). Entre deux lignes
+/// du tableau, la ligne supérieure est retenue (côté sécurité) ; au-delà de 20,
+/// la ligne de 20.
+double k5216(int nombre, DistanceEnterre distance) {
+  if (nombre < 1) throw ArgumentError('Nombre >= 1 requis');
+  if (nombre == 1) return 1;
+  for (final e in _t5216.entries) {
+    if (nombre <= e.key) return e.value[distance.index];
+  }
+  return _t5216[20]![distance.index];
+}
+
+/// Tableau 52.11 : (résistivité thermique du sol en K·m/W, facteur pour un
+/// câble directement dans le sol, facteur pour un câble en conduit). Base du
+/// tableau 52.8H : 2,5 K·m/W.
+const List<(double, double, double)> resistivitesSol = [
+  (0.40, 2.31, 2.00),
+  (0.50, 1.88, 1.28),
+  (0.70, 1.62, 1.20),
+  (0.85, 1.56, 1.19),
+  (1.00, 1.50, 1.18),
+  (1.50, 1.28, 1.10),
+  (2.00, 1.12, 1.05),
+  (2.50, 1.00, 1.00),
+  (3.00, 0.90, 0.96),
+];
+
+/// Humidité du terrain associée à certaines résistivités (colonne
+/// « Humidité » du tableau 52.11).
+final Map<double, String> humiditeSol = {
+  0.40: 'pose immergée',
+  0.50: 'terrain très humide',
+  0.70: 'terrain humide',
+  0.85: 'terrain dit normal',
+  1.00: 'terrain sec',
+  1.50: 'terrain très sec',
+};
+
+/// Facteur du tableau 52.11 pour une résistivité du tableau.
+/// Lève [ArgumentError] si [resistivite] n'est pas une ligne du tableau.
+double kResistiviteSol(double resistivite, {bool conduit = false}) {
+  for (final (r, direct, enConduit) in resistivitesSol) {
+    if ((r - resistivite).abs() < 1e-9) return conduit ? enConduit : direct;
+  }
+  throw ArgumentError('Résistivité $resistivite K.m/W absente du tableau 52.11');
+}

@@ -21,6 +21,14 @@ const _libellesMode = {
   ModePose.f: 'F — Unipolaires sur corbeaux, colliers, chemins perforés',
 };
 
+const _libellesDistanceEnterre = {
+  DistanceEnterre.nulle: 'Nulle (câbles jointifs)',
+  DistanceEnterre.undiametre: 'Un diamètre de câble',
+  DistanceEnterre.m0125: '0,125 m',
+  DistanceEnterre.m025: '0,25 m',
+  DistanceEnterre.m05: '0,5 m',
+};
+
 const _libellesDistance = {
   DistanceCables.nulle: 'Nulle (câbles jointifs)',
   DistanceCables.undiametre: 'Un diamètre de câble',
@@ -238,13 +246,34 @@ class _AssistantK extends ConsumerWidget {
               options: _libellesCouches,
               onChanged: (v) => n.modifierK((k) => k.copyWith(nbCouches: v)),
             ),
-          if (sol)
+          if (sol && p.edition == EditionNorme.norme2013)
             ListeDeroulante<DistanceCables>(
               label: 'Distance entre câbles',
               valeur: p.distance,
               options: _libellesDistance,
               onChanged: (v) => n.modifierK((k) => k.copyWith(distance: v)),
             ),
+          if (sol && p.edition != EditionNorme.norme2013) ...[
+            ListeDeroulante<DistanceEnterre>(
+              label: 'Distance entre câbles',
+              valeur: p.distanceEnterre,
+              options: _libellesDistanceEnterre,
+              onChanged: (v) =>
+                  n.modifierK((k) => k.copyWith(distanceEnterre: v)),
+            ),
+            ListeDeroulante<double>(
+              label: 'Résistivité thermique du sol',
+              valeur: p.resistiviteSol,
+              options: {
+                for (final (r, _, _) in resistivitesSol)
+                  r: '${fmtCompact(r)} K·m/W'
+                      '${humiditeSol[r] == null ? '' : ' — ${humiditeSol[r]}'}'
+                      '${r == 2.5 ? ' (base du tableau)' : ''}',
+              },
+              onChanged: (v) =>
+                  n.modifierK((k) => k.copyWith(resistiviteSol: v)),
+            ),
+          ],
           if (mode == ModePose.b)
             ListeDeroulante<double>(
               label: 'Coefficient complémentaire K7',

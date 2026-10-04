@@ -93,6 +93,7 @@ final surchargeVueProvider = Provider<SurchargeVue>((ref) {
       section: e.section,
       coefficientK: k,
       nbParalleles: e.nbParalleles,
+      edition: e.paramsK.edition,
     );
     return SurchargeVue(k: k, resultat: r);
   } on ArgumentError catch (ex) {

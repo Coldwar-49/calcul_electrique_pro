@@ -73,7 +73,12 @@ void main() {
   group('Surcharges (I = a × S^b, cellules U6:AD25 pour S = 240)', () {
     double? i240(Isolant iso, Circuit c, ModePose m, Ame a) =>
         courantFormule(
-            isolant: iso, circuit: c, mode: m, ame: a, section: 240);
+            isolant: iso,
+            circuit: c,
+            mode: m,
+            ame: a,
+            section: 240,
+            edition: EditionNorme.norme2013);
 
     test('PR 3 D alu (AD24)', () {
       expect(i240(Isolant.pr, Circuit.triphase, ModePose.d, Ame.aluminium),
@@ -96,13 +101,15 @@ void main() {
           circuit: Circuit.triphase,
           mode: ModePose.d,
           ame: Ame.cuivre,
-          section: 50);
+          section: 50,
+          edition: EditionNorme.norme2013);
       final b = courantFormule(
           isolant: Isolant.pr,
           circuit: Circuit.triphase,
           mode: ModePose.d,
           ame: Ame.cuivre,
-          section: 47.5);
+          section: 47.5,
+          edition: EditionNorme.norme2013);
       expect(a, b);
     });
 
@@ -113,9 +120,66 @@ void main() {
           mode: ModePose.d,
           ame: Ame.aluminium,
           section: 240,
-          coefficientK: 1);
+          coefficientK: 1,
+          edition: EditionNorme.norme2013);
       expect(r.i, closeTo(408.7326153680451, 1e-9));
       expect(r.calibre, 315);
+    });
+
+    test('mode D en 2024 : tableau 52.8H.2 (D2), sol à 2,5 K·m/W', () {
+      double? iz(Ame a, Isolant i, Circuit c, double s) =>
+          courantFormule(
+              isolant: i, circuit: c, mode: ModePose.d, ame: a, section: s);
+      expect(iz(Ame.cuivre, Isolant.pvc, Circuit.triphase, 16), 70);
+      expect(iz(Ame.cuivre, Isolant.pvc, Circuit.monophase, 16), 83);
+      expect(iz(Ame.cuivre, Isolant.pr, Circuit.triphase, 25), 107);
+      expect(iz(Ame.cuivre, Isolant.pr, Circuit.monophase, 300), 502);
+      expect(iz(Ame.aluminium, Isolant.pr, Circuit.triphase, 240), 290);
+      expect(iz(Ame.aluminium, Isolant.pvc, Circuit.monophase, 16), 63);
+      // Sections absentes du tableau : aluminium < 16 mm², plus de 300 mm².
+      expect(iz(Ame.aluminium, Isolant.pr, Circuit.triphase, 10), isNull);
+      expect(iz(Ame.cuivre, Isolant.pr, Circuit.triphase, 400), isNull);
+      // La section 50 n'est pas remplacée par 47,5 dans le tableau 2024.
+      expect(iz(Ame.cuivre, Isolant.pvc, Circuit.triphase, 50), 130);
+    });
+
+    test('mode D en 2024 : K = K1(sol) x groupement 52.16 x résistivité 52.11', () {
+      // 3 circuits à 0,25 m, sol à 1 K.m/W, PR, 20 °C : 1 x 0,80 x 1,5.
+      final k = coefficientPourMode(
+          ModePose.d,
+          Isolant.pr,
+          const ParamsK(
+              temperature: 20,
+              nbCircuits: 3,
+              distanceEnterre: DistanceEnterre.m025,
+              resistiviteSol: 1.0));
+      expect(k, closeTo(0.80 * 1.5, 1e-12));
+      // Même cas avec le classeur 2013 : tableau 52R, sans résistivité.
+      final k13 = coefficientPourMode(
+          ModePose.d,
+          Isolant.pr,
+          const ParamsK(
+              temperature: 20,
+              nbCircuits: 3,
+              edition: EditionNorme.norme2013,
+              distance: DistanceCables.cm25));
+      expect(k13, closeTo(0.74, 1e-12));
+    });
+
+    test('tableaux 52.16 et 52.11', () {
+      expect(k5216(1, DistanceEnterre.nulle), 1);
+      expect(k5216(2, DistanceEnterre.nulle), 0.75);
+      expect(k5216(6, DistanceEnterre.m05), 0.80);
+      expect(k5216(12, DistanceEnterre.m0125), 0.51);
+      expect(k5216(20, DistanceEnterre.m025), 0.53);
+      expect(k5216(10, DistanceEnterre.nulle), 0.36); // ligne 12 (sécurité)
+      expect(k5216(30, DistanceEnterre.nulle), 0.29);
+      expect(kResistiviteSol(2.5), 1);
+      expect(kResistiviteSol(1.0), 1.5);
+      expect(kResistiviteSol(1.0, conduit: true), 1.18);
+      expect(kResistiviteSol(0.4), 2.31);
+      expect(kResistiviteSol(3.0), 0.9);
+      expect(() => kResistiviteSol(1.2), throwsArgumentError);
     });
   });
 

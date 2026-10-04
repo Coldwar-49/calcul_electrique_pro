@@ -20,6 +20,8 @@ class ParamsK {
     this.edition = EditionNorme.normeActuelle,
     this.symetrique = true,
     this.distance = DistanceCables.nulle,
+    this.distanceEnterre = DistanceEnterre.nulle,
+    this.resistiviteSol = 2.5,
     this.k7 = 1,
   });
 
@@ -36,6 +38,11 @@ class ParamsK {
   final bool symetrique;
   final DistanceCables distance;
 
+  /// Mode D en 2024 : distance entre câbles (tableau 52.16) et résistivité
+  /// thermique du sol en K·m/W (tableau 52.11).
+  final DistanceEnterre distanceEnterre;
+  final double resistiviteSol;
+
   /// Coefficient complémentaire K7 (modes B et C), 1 si aucun cas particulier.
   final double k7;
 
@@ -50,6 +57,8 @@ class ParamsK {
     EditionNorme? edition,
     bool? symetrique,
     DistanceCables? distance,
+    DistanceEnterre? distanceEnterre,
+    double? resistiviteSol,
     double? k7,
   }) =>
       ParamsK(
@@ -63,6 +72,8 @@ class ParamsK {
         edition: edition ?? this.edition,
         symetrique: symetrique ?? this.symetrique,
         distance: distance ?? this.distance,
+        distanceEnterre: distanceEnterre ?? this.distanceEnterre,
+        resistiviteSol: resistiviteSol ?? this.resistiviteSol,
         k7: k7 ?? this.k7,
       );
 }
@@ -110,7 +121,12 @@ double coefficientPourMode(ModePose mode, Isolant isolant, ParamsK p) {
     ModePose.d => coefficientMethodeD(
         isolant: isolant,
         temperatureSol: t,
-        k2: k52r(n, p.distance),
+        // 2024 : groupement du tableau 52.16 x facteur de résistivité du sol
+        // (tableau 52.11, câble directement enterré).
+        k2: p.edition == EditionNorme.norme2013
+            ? k52r(n, p.distance)
+            : k5216(n, p.distanceEnterre) *
+                kResistiviteSol(p.resistiviteSol),
         risqueBe3: p.risqueBe3,
         harmoniquesSup15: p.harmoniquesSup15,
         edition: p.edition,

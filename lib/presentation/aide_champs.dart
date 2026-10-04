@@ -142,6 +142,12 @@ const Map<String, String> _aides = {
       'Tension composée entre phases, utilisée en régime IT sans neutre '
       'distribué.',
   'Tension': 'Tension d\'alimentation du récepteur ou du circuit, en volts.',
+  'Résistivité thermique du sol':
+      'Capacité du terrain à évacuer la chaleur du câble enterré, en K·m/W. '
+          'Les courants admissibles du tableau 52.8H sont établis pour '
+          '2,5 K·m/W ; un sol plus conducteur (plus humide, plus faible '
+          'valeur) augmente le courant admissible (tableau 52.11). Un sol sec '
+          'est généralement plus proche de 1 K·m/W en France.',
   'Taux d\'harmoniques de rang 3':
       'Part des harmoniques de rang 3 (et multiples de 3) dans le courant '
           'de phase, en %. Elles s\'additionnent dans le neutre. Au-delà de '
