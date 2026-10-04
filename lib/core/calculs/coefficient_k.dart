@@ -222,7 +222,8 @@ double coefficientMethodeEF({
   bool symetrique = true,
 }) =>
     k1Temperature(isolant, temperature) *
-    k2MethodesEF(nbCircuits, tablettePerforee: tablettePerforee) *
+    k2MethodesEF(nbCircuits,
+        tablettePerforee: tablettePerforee, edition: edition) *
     k3Couches(nbCouches) *
     kRisqueBe3(risqueBe3) *
     kHarmoniques(harmoniquesSup15, edition: edition) *

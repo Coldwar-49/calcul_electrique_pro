@@ -4,6 +4,7 @@ library;
 import 'dart:math' as math;
 
 import '../donnees/calibres.dart';
+import '../donnees/courants_admissibles_2024.dart';
 import '../donnees/courants_admissibles_d2.dart';
 import '../donnees/formules_surcharge.dart';
 import '../donnees/sections_resistivites.dart';
@@ -23,6 +24,11 @@ double? courantFormule({
   // 2,5 K·m/W ; la résistivité réelle est corrigée par K).
   if (edition != EditionNorme.norme2013 && mode == ModePose.d) {
     return courantD2(ame, isolant, circuit, section);
+  }
+  // 2024, modes B, C, E, F : tableaux 52.8C, 52.8E, 52.8F (valeurs exactes ;
+  // une case vide du tableau donne « ! »).
+  if (edition != EditionNorme.norme2013) {
+    return courantTableau2024(mode, ame, isolant, circuit, section);
   }
   final s = corrigerSection(section);
   final coeffs = ligneSurcharge(isolant, circuit, mode)?.pour(s);

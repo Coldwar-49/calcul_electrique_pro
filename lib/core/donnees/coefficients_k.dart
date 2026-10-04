@@ -112,9 +112,32 @@ double k2MethodeC(int nombre,
   return (plafond ? plaf : mur)[nombre - 1].toDouble();
 }
 
+/// Tableau 52.13 (2024), un étage de câbles jointifs : colonnes 1, 2, 3, 4, 6
+/// et 9 câbles. Entre deux colonnes, la colonne supérieure est retenue (côté
+/// sécurité) ; au-delà de 9, la colonne 9.
+const Map<int, double> _t5213Perforees = {
+  1: 1.0, 2: 0.88, 3: 0.82, 4: 0.79, 6: 0.76, 9: 0.73,
+};
+const Map<int, double> _t5213Echelles = {
+  1: 1.0, 2: 0.87, 3: 0.82, 4: 0.80, 6: 0.79, 9: 0.78,
+};
+
 /// K2 méthodes E et F : échelles/corbeaux/treillis ou tablettes perforées.
-double k2MethodesEF(int nombre, {required bool tablettePerforee}) {
+///
+/// 2024 : tableau 52.13 (câbles multiconducteurs, un étage, jointifs). Pour la
+/// méthode F, le tableau 52.14 donne des facteurs moins sévères (jusqu'à 1,00
+/// en trèfle espacé) ; ceux de 52.13 sont conservés, plus prudents.
+double k2MethodesEF(int nombre,
+    {required bool tablettePerforee,
+    EditionNorme edition = EditionNorme.normeActuelle}) {
   if (nombre < 1) throw ArgumentError('Nombre >= 1 requis');
+  if (edition != EditionNorme.norme2013) {
+    final t = tablettePerforee ? _t5213Perforees : _t5213Echelles;
+    for (final e in t.entries) {
+      if (nombre <= e.key) return e.value;
+    }
+    return t[9]!;
+  }
   const echelles = [1, 0.88, 0.82, 0.8, 0.8, 0.79, 0.79];
   const perforees = [1, 0.88, 0.82, 0.77, 0.75, 0.73, 0.73];
   if (nombre >= 8) return tablettePerforee ? 0.72 : 0.78;

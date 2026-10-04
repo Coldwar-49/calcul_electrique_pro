@@ -36,8 +36,19 @@ void main() {
           temperature: 30,
           nbCircuits: 4,
           tablettePerforee: true,
-          nbCouches: 1);
+          nbCouches: 1,
+          edition: EditionNorme.norme2013);
       expect(k, closeTo(0.77, 1e-12));
+    });
+
+    test('méthode E en 2024 : même cas, tableau 52.13 -> 0,79', () {
+      final k = coefficientMethodeEF(
+          isolant: Isolant.pr,
+          temperature: 30,
+          nbCircuits: 4,
+          tablettePerforee: true,
+          nbCouches: 1);
+      expect(k, closeTo(0.79, 1e-12));
     });
 
     test('méthode F : PVC 40 °C, 2 circuits, 3 couches, Th>15 %, asym.', () {
@@ -62,7 +73,8 @@ void main() {
           nbCouches: 3,
           harmoniquesSup15: true,
           symetrique: false);
-      expect(k, closeTo(0.37557273599999996 / 0.84 * 0.86, 1e-12));
+      // K5 : 0,86 au lieu de 0,84 ; K2 (2 circuits, échelles) : 0,87 au lieu de 0,88.
+      expect(k, closeTo(0.37557273599999996 / 0.84 * 0.86 * 0.87 / 0.88, 1e-12));
     });
 
     test('température hors tableau -> ArgumentError', () {
@@ -124,6 +136,64 @@ void main() {
           edition: EditionNorme.norme2013);
       expect(r.i, closeTo(408.7326153680451, 1e-9));
       expect(r.calibre, 315);
+    });
+
+    test('modes B, C, E, F en 2024 : tableaux 52.8C, 52.8E, 52.8F (valeurs exactes)', () {
+      double? iz(ModePose m, Ame a, Isolant i, Circuit c, double s) =>
+          courantFormule(isolant: i, circuit: c, mode: m, ame: a, section: s);
+      // B1 (52.8C)
+      expect(iz(ModePose.b, Ame.cuivre, Isolant.pvc, Circuit.triphase, 1.5), 15.5);
+      expect(iz(ModePose.b, Ame.cuivre, Isolant.pr, Circuit.monophase, 300), 603);
+      expect(iz(ModePose.b, Ame.aluminium, Isolant.pr, Circuit.triphase, 120), 251);
+      expect(iz(ModePose.b, Ame.cuivre, Isolant.pr, Circuit.monophase, 630), 995);
+      // Cases vides : 400 à 630 mm² n'existent que pour PR 2 en B1.
+      expect(iz(ModePose.b, Ame.cuivre, Isolant.pvc, Circuit.triphase, 400), isNull);
+      expect(iz(ModePose.b, Ame.cuivre, Isolant.pr, Circuit.triphase, 500), isNull);
+      // C (52.8E)
+      expect(iz(ModePose.c, Ame.cuivre, Isolant.pvc, Circuit.triphase, 16), 76);
+      expect(iz(ModePose.c, Ame.cuivre, Isolant.pr, Circuit.triphase, 630), 923);
+      expect(iz(ModePose.c, Ame.aluminium, Isolant.pr, Circuit.monophase, 300), 508);
+      expect(iz(ModePose.c, Ame.cuivre, Isolant.pvc, Circuit.triphase, 400), isNull);
+      // E (52.8F, multiconducteurs)
+      expect(iz(ModePose.e, Ame.cuivre, Isolant.pvc, Circuit.triphase, 25), 101);
+      expect(iz(ModePose.e, Ame.cuivre, Isolant.pr, Circuit.monophase, 300), 741);
+      expect(iz(ModePose.e, Ame.aluminium, Isolant.pr, Circuit.triphase, 240), 409);
+      expect(iz(ModePose.e, Ame.cuivre, Isolant.pr, Circuit.triphase, 400), isNull);
+      // F (52.8F, monoconducteurs : 3 conducteurs en trèfle)
+      expect(iz(ModePose.f, Ame.cuivre, Isolant.pr, Circuit.triphase, 25), 135);
+      expect(iz(ModePose.f, Ame.cuivre, Isolant.pvc, Circuit.monophase, 630), 1005);
+      expect(iz(ModePose.f, Ame.aluminium, Isolant.pr, Circuit.triphase, 630), 899);
+      expect(iz(ModePose.f, Ame.cuivre, Isolant.pr, Circuit.monophase, 10), isNull);
+      // Le classeur 2013 donne toujours une valeur par formule.
+      expect(
+          courantFormule(
+              isolant: Isolant.pr,
+              circuit: Circuit.triphase,
+              mode: ModePose.b,
+              ame: Ame.cuivre,
+              section: 500,
+              edition: EditionNorme.norme2013),
+          isNotNull);
+    });
+
+    test('formule du classeur : écart avec les tableaux 2024 au plus 12 %', () {
+      // Les formules a x S^b du classeur ajustent les tableaux 2024 ; le pire
+      // écart relevé (B1, aluminium) est de -11,2 %, le pire excès de +8,2 %
+      // (300 mm², PVC 3). Les modes C, E et F sont à moins de 6 %.
+      for (final (mode, ame, iso, circ) in [
+        (ModePose.c, Ame.cuivre, Isolant.pr, Circuit.triphase),
+        (ModePose.e, Ame.cuivre, Isolant.pvc, Circuit.monophase),
+        (ModePose.b, Ame.aluminium, Isolant.pvc, Circuit.triphase),
+      ]) {
+        for (final s in [10.0, 35.0, 120.0, 240.0]) {
+          final f = courantFormule(
+              isolant: iso, circuit: circ, mode: mode, ame: ame, section: s,
+              edition: EditionNorme.norme2013)!;
+          final t = courantFormule(
+              isolant: iso, circuit: circ, mode: mode, ame: ame, section: s)!;
+          expect((f - t).abs() / t, lessThan(0.12), reason: '$mode $ame $s');
+        }
+      }
     });
 
     test('mode D en 2024 : tableau 52.8H.2 (D2), sol à 2,5 K·m/W', () {
@@ -225,6 +295,21 @@ void main() {
       expect(k2MethodeC(2, plafond: true, edition: EditionNorme.norme2013), 0.85);
       // Sur mur : inchangé.
       expect(k2MethodeC(2, plafond: false), 0.85);
+    });
+
+    test('K2 méthodes E et F : tableau 52.13 (un étage, jointifs)', () {
+      const ech = {1: 1.0, 2: 0.87, 3: 0.82, 4: 0.80, 6: 0.79, 9: 0.78};
+      const per = {1: 1.0, 2: 0.88, 3: 0.82, 4: 0.79, 6: 0.76, 9: 0.73};
+      ech.forEach((n, k) =>
+          expect(k2MethodesEF(n, tablettePerforee: false), k, reason: 'échelles $n'));
+      per.forEach((n, k) =>
+          expect(k2MethodesEF(n, tablettePerforee: true), k, reason: 'perforées $n'));
+      // Entre deux colonnes : colonne supérieure ; au-delà de 9 : colonne 9.
+      expect(k2MethodesEF(5, tablettePerforee: true), 0.76);
+      expect(k2MethodesEF(8, tablettePerforee: false), 0.78);
+      // Classeur 2013.
+      expect(k2MethodesEF(2, tablettePerforee: false, edition: EditionNorme.norme2013), 0.88);
+      expect(k2MethodesEF(4, tablettePerforee: true, edition: EditionNorme.norme2013), 0.77);
     });
 
     test('K1 (tableaux 52.9 et 52.10) et K3 (52.15) : valeurs identiques', () {
