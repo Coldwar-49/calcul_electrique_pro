@@ -9,6 +9,7 @@ import 'compensation_screen.dart';
 import 'contacts_indirects_screen.dart';
 import 'contrainte_thermique_screen.dart';
 import 'courant_emploi_screen.dart';
+import 'demarrage_moteur_screen.dart';
 import 'dimensionnement_screen.dart';
 import 'filiation_screen.dart';
 import 'ik_max_screen.dart';
@@ -69,6 +70,12 @@ const _groupes = [
       Icons.electric_meter_outlined,
       Icons.electric_meter,
       CourantEmploiScreen(),
+    ),
+    _Destination(
+      'Démarrage de moteur',
+      Icons.settings_suggest_outlined,
+      Icons.settings_suggest,
+      DemarrageMoteurScreen(),
     ),
     _Destination(
       'Dimensionnement',

@@ -1,4 +1,6 @@
 // Valeurs de référence : NF C 15-100-1 (2024-08), tableau 41.1.
+import 'package:calcul_electrique_pro/core/calculs/protection_tt.dart';
+import 'package:calcul_electrique_pro/core/donnees/tableau_53_1.dart';
 import 'package:calcul_electrique_pro/core/donnees/temps_coupure.dart';
 import 'package:calcul_electrique_pro/core/calculs/chute_tension.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -42,5 +44,16 @@ void main() {
         [const LigneChuteTension(longueur: 75), const LigneChuteTension(longueur: 75)],
         majorerSeuilLongueur: true);
     expect(deux.last.seuil - sans, closeTo(0.0025, 1e-12));
+  });
+
+  test('tableau 53.1 : valeurs arrondies, cohérentes avec 50 V / IΔn', () {
+    for (final (idn, r) in tableau531) {
+      final calcule = calculerProtectionTT(sensibilite: idn, tensionLimite: 50)
+          .resistanceMax;
+      expect(r, closeTo(calcule, 0.5), reason: 'IΔn = $idn A');
+    }
+    expect(resistanceTableau531(0.3), 167);
+    expect(resistanceTableau531(0.03), 500); // « > 500 »
+    expect(resistanceTableau531(0.02), isNull);
   });
 }

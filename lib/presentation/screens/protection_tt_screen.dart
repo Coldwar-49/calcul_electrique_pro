@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/calculs/protection_tt.dart';
+import '../../core/donnees/tableau_53_1.dart';
 import '../../core/donnees/temps_coupure.dart';
 import '../formats.dart';
 import '../providers/protection_tt_provider.dart';
@@ -103,6 +104,10 @@ class _Resultat extends ConsumerWidget {
     final e = ref.watch(protectionTTEntreeProvider);
     final c = r.conforme;
     final tCoupure = tempsCoupureMax(e.u0, SchemaTemps.tt);
+    // Tableau 53.1 : valeurs arrondies de la norme (UL = 50 V seulement).
+    final r531 = e.limite == TensionLimite.v50
+        ? resistanceTableau531(e.sensibiliteMa / 1000)
+        : null;
     return PanneauResultat(
       libelle: 'Résistance de terre maximale Ra',
       valeur: fmt(r.resistanceMax),
@@ -119,6 +124,12 @@ class _Resultat extends ConsumerWidget {
               : 'Non conforme : Ra × IΔn = ${fmt(r.tensionDeContact!)} V '
                   '> ${fmtCompact(e.limite.volts)} V',
       details: [
+        if (r531 != null)
+          LigneDetail(
+              'Tableau 53.1',
+              e.sensibiliteMa == 30
+                  ? '> ${fmtCompact(r531)} Ω'
+                  : '${fmtCompact(r531)} Ω'),
         if (tCoupure != null)
           LigneDetail('Temps de coupure maximal (tableau 41.1, TT)',
               '${fmtCompact(tCoupure)} s'),

@@ -142,6 +142,26 @@ const Map<String, String> _aides = {
       'Tension composée entre phases, utilisée en régime IT sans neutre '
       'distribué.',
   'Tension': 'Tension d\'alimentation du récepteur ou du circuit, en volts.',
+  'Alimentation du moteur':
+      'Moteur monophasé 230 V ou triphasé 400 V : les limites du tableau '
+          'dépendent du type d\'alimentation.',
+  'Type de local':
+      'Habitation (branchement à puissance limitée) ou autres locaux '
+          '(tertiaire, industriel, agricole… avec branchement à puissance '
+          'surveillée) : les limites ne sont pas les mêmes.',
+  'Réseau de distribution':
+      'Réseau public aérien ou souterrain : un réseau souterrain, plus '
+          'robuste, admet des moteurs plus puissants et un courant de '
+          'démarrage plus élevé.',
+  'Mode de démarrage':
+      'Démarrage direct à pleine puissance, ou autre mode (étoile-triangle, '
+          'démarreur progressif, variateur…) qui limite le courant d\'appel.',
+  'Puissance du moteur (facultatif)':
+      'Puissance apparente du moteur en kVA. Vide : seule la limite est '
+          'affichée.',
+  'Intensité de démarrage (facultatif)':
+      'Courant d\'appel du moteur au démarrage, en ampères. Vide : seule la '
+          'limite est affichée.',
   'Résistivité thermique du sol':
       'Capacité du terrain à évacuer la chaleur du câble enterré, en K·m/W. '
           'Les courants admissibles du tableau 52.8H sont établis pour '
