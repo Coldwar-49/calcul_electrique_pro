@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/calculs/coefficient_k.dart';
 import '../../core/donnees/coefficients_k.dart';
+import '../../core/donnees/courants_admissibles_d1.dart'
+    show DistanceConduits;
 import '../../core/donnees/sections_resistivites.dart';
 import '../../core/donnees/types.dart';
 import '../formats.dart';
@@ -254,13 +256,36 @@ class _AssistantK extends ConsumerWidget {
               onChanged: (v) => n.modifierK((k) => k.copyWith(distance: v)),
             ),
           if (sol && p.edition != EditionNorme.norme2013) ...[
-            ListeDeroulante<DistanceEnterre>(
-              label: 'Distance entre câbles',
-              valeur: p.distanceEnterre,
-              options: _libellesDistanceEnterre,
-              onChanged: (v) =>
-                  n.modifierK((k) => k.copyWith(distanceEnterre: v)),
+            ListeDeroulante<bool>(
+              label: 'Pose enterrée',
+              valeur: p.enConduit,
+              options: const {
+                false: 'Câbles directement dans le sol (D2)',
+                true: 'Câbles dans des conduits enterrés (D1)',
+              },
+              onChanged: (v) => n.modifierK((k) => k.copyWith(enConduit: v)),
             ),
+            if (p.enConduit)
+              ListeDeroulante<DistanceConduits>(
+                label: 'Distance entre conduits',
+                valeur: p.distanceConduits,
+                options: const {
+                  DistanceConduits.nulle: 'Nulle (conduits jointifs)',
+                  DistanceConduits.m025: '0,25 m',
+                  DistanceConduits.m05: '0,5 m',
+                  DistanceConduits.m1: '1 m',
+                },
+                onChanged: (v) =>
+                    n.modifierK((k) => k.copyWith(distanceConduits: v)),
+              )
+            else
+              ListeDeroulante<DistanceEnterre>(
+                label: 'Distance entre câbles',
+                valeur: p.distanceEnterre,
+                options: _libellesDistanceEnterre,
+                onChanged: (v) =>
+                    n.modifierK((k) => k.copyWith(distanceEnterre: v)),
+              ),
             ListeDeroulante<double>(
               label: 'Résistivité thermique du sol',
               valeur: p.resistiviteSol,

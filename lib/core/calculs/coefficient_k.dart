@@ -5,6 +5,7 @@
 library;
 
 import '../donnees/coefficients_k.dart';
+import '../donnees/courants_admissibles_d1.dart' show DistanceConduits, k5217A;
 import '../donnees/types.dart';
 
 /// Paramètres saisis pour calculer K, tous modes de pose confondus.
@@ -22,6 +23,8 @@ class ParamsK {
     this.distance = DistanceCables.nulle,
     this.distanceEnterre = DistanceEnterre.nulle,
     this.resistiviteSol = 2.5,
+    this.enConduit = false,
+    this.distanceConduits = DistanceConduits.nulle,
     this.k7 = 1,
   });
 
@@ -43,6 +46,11 @@ class ParamsK {
   final DistanceEnterre distanceEnterre;
   final double resistiviteSol;
 
+  /// Mode D en 2024 : câbles dans des conduits enterrés (D1, tableau 52.17)
+  /// au lieu de câbles directement enterrés (D2, tableau 52.16).
+  final bool enConduit;
+  final DistanceConduits distanceConduits;
+
   /// Coefficient complémentaire K7 (modes B et C), 1 si aucun cas particulier.
   final double k7;
 
@@ -59,6 +67,8 @@ class ParamsK {
     DistanceCables? distance,
     DistanceEnterre? distanceEnterre,
     double? resistiviteSol,
+    bool? enConduit,
+    DistanceConduits? distanceConduits,
     double? k7,
   }) =>
       ParamsK(
@@ -74,6 +84,8 @@ class ParamsK {
         distance: distance ?? this.distance,
         distanceEnterre: distanceEnterre ?? this.distanceEnterre,
         resistiviteSol: resistiviteSol ?? this.resistiviteSol,
+        enConduit: enConduit ?? this.enConduit,
+        distanceConduits: distanceConduits ?? this.distanceConduits,
         k7: k7 ?? this.k7,
       );
 }
@@ -125,8 +137,11 @@ double coefficientPourMode(ModePose mode, Isolant isolant, ParamsK p) {
         // (tableau 52.11, câble directement enterré).
         k2: p.edition == EditionNorme.norme2013
             ? k52r(n, p.distance)
-            : k5216(n, p.distanceEnterre) *
-                kResistiviteSol(p.resistiviteSol),
+            : p.enConduit
+                ? k5217A(n, p.distanceConduits) *
+                    kResistiviteSol(p.resistiviteSol, conduit: true)
+                : k5216(n, p.distanceEnterre) *
+                    kResistiviteSol(p.resistiviteSol),
         risqueBe3: p.risqueBe3,
         harmoniquesSup15: p.harmoniquesSup15,
         edition: p.edition,

@@ -5,6 +5,7 @@ import 'dart:math' as math;
 
 import '../donnees/calibres.dart';
 import '../donnees/courants_admissibles_2024.dart';
+import '../donnees/courants_admissibles_d1.dart';
 import '../donnees/courants_admissibles_d2.dart';
 import '../donnees/formules_surcharge.dart';
 import '../donnees/sections_resistivites.dart';
@@ -19,11 +20,14 @@ double? courantFormule({
   required Ame ame,
   required double section,
   EditionNorme edition = EditionNorme.normeActuelle,
+  bool enConduit = false,
 }) {
   // 2024, mode D : câbles directement enterrés, tableau 52.8H.2 (sol à
   // 2,5 K·m/W ; la résistivité réelle est corrigée par K).
   if (edition != EditionNorme.norme2013 && mode == ModePose.d) {
-    return courantD2(ame, isolant, circuit, section);
+    return enConduit
+        ? courantD1(ame, isolant, circuit, section)
+        : courantD2(ame, isolant, circuit, section);
   }
   // 2024, modes B, C, E, F : tableaux 52.8C, 52.8E, 52.8F (valeurs exactes ;
   // une case vide du tableau donne « ! »).
@@ -68,6 +72,7 @@ ResultatSurcharge calculerSurcharge({
   required double coefficientK,
   int nbParalleles = 1,
   EditionNorme edition = EditionNorme.normeActuelle,
+  bool enConduit = false,
 }) {
   final base = courantFormule(
         isolant: isolant,
@@ -76,6 +81,7 @@ ResultatSurcharge calculerSurcharge({
         ame: ame,
         section: section,
         edition: edition,
+        enConduit: enConduit,
       ) ??
       0;
   final i = coefficientK * nbParalleles * base * 1.05;

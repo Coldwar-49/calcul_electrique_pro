@@ -4,6 +4,7 @@ import 'package:calcul_electrique_pro/core/calculs/coefficient_k.dart';
 import 'package:calcul_electrique_pro/core/calculs/surcharges.dart';
 import 'package:calcul_electrique_pro/core/donnees/calibres.dart';
 import 'package:calcul_electrique_pro/core/donnees/coefficients_k.dart';
+import 'package:calcul_electrique_pro/core/donnees/courants_admissibles_d1.dart';
 import 'package:calcul_electrique_pro/core/donnees/types.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -234,6 +235,43 @@ void main() {
               edition: EditionNorme.norme2013,
               distance: DistanceCables.cm25));
       expect(k13, closeTo(0.74, 1e-12));
+    });
+
+    test('mode D en conduit enterré (D1, tableau 52.8H.1) et 52.17 A', () {
+      double? iz(Ame a, Isolant i, Circuit c, double s) => courantFormule(
+          isolant: i,
+          circuit: c,
+          mode: ModePose.d,
+          ame: a,
+          section: s,
+          enConduit: true);
+      expect(iz(Ame.cuivre, Isolant.pvc, Circuit.triphase, 1.5), 18);
+      expect(iz(Ame.cuivre, Isolant.pr, Circuit.monophase, 300), 446);
+      expect(iz(Ame.cuivre, Isolant.pr, Circuit.triphase, 16), 75);
+      expect(iz(Ame.aluminium, Isolant.pvc, Circuit.monophase, 25), 77);
+      expect(iz(Ame.aluminium, Isolant.pr, Circuit.triphase, 10), 46);
+      expect(iz(Ame.aluminium, Isolant.pr, Circuit.triphase, 6), isNull);
+      expect(iz(Ame.cuivre, Isolant.pr, Circuit.triphase, 400), isNull);
+      // Un conduit coûte moins cher qu'un câble direct pour un petit câble : D1 < D2.
+      expect(iz(Ame.cuivre, Isolant.pvc, Circuit.triphase, 16),
+          lessThan(70));
+      expect(k5217A(1, DistanceConduits.nulle), 1);
+      expect(k5217A(2, DistanceConduits.nulle), 0.85);
+      expect(k5217A(5, DistanceConduits.m025), 0.80);
+      expect(k5217A(12, DistanceConduits.m1), 0.85);
+      expect(k5217A(20, DistanceConduits.m05), 0.68);
+      expect(k5217A(30, DistanceConduits.nulle), 0.34);
+      // K : 2 conduits à 0,5 m, sol à 1 K.m/W (colonne « en conduit » 1,18).
+      final k = coefficientPourMode(
+          ModePose.d,
+          Isolant.pr,
+          const ParamsK(
+              temperature: 20,
+              nbCircuits: 2,
+              enConduit: true,
+              distanceConduits: DistanceConduits.m05,
+              resistiviteSol: 1.0));
+      expect(k, closeTo(0.95 * 1.18, 1e-12));
     });
 
     test('tableaux 52.16 et 52.11', () {

@@ -142,6 +142,14 @@ const Map<String, String> _aides = {
       'Tension composée entre phases, utilisée en régime IT sans neutre '
       'distribué.',
   'Tension': 'Tension d\'alimentation du récepteur ou du circuit, en volts.',
+  'Pose enterrée':
+      'Câbles posés directement dans le sol (méthode D2) ou tirés dans des '
+          'conduits enterrés (méthode D1) : les courants admissibles, les '
+          'facteurs de résistivité du sol et de groupement ne sont pas les '
+          'mêmes.',
+  'Distance entre conduits':
+      'Espacement entre conduits enterrés voisins (tableau 52.17) : plus ils '
+          'sont éloignés, moins le groupement réduit le courant admissible.',
   'Conducteur de terre':
       'Conducteur reliant la borne principale de terre à la prise de terre. '
           'Enterré, sa section minimale dépend de sa nature (tableau 54.2) ; '
