@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/calculs/section_pe.dart'
+    show NatureTerre, sectionConducteurTerre;
 import '../../core/donnees/k_conducteurs_protection.dart';
 import '../../core/donnees/sections_resistivites.dart';
 import '../../core/donnees/types.dart';
@@ -150,6 +152,20 @@ class _Formulaire extends ConsumerWidget {
             ],
           ),
         ),
+        CarteSection(
+          titre: 'Conducteur de terre',
+          icone: Icons.south_outlined,
+          child: GrilleChamps(
+            children: [
+              ListeDeroulante<NatureTerre>(
+                label: 'Conducteur de terre',
+                valeur: e.terre,
+                options: {for (final t in NatureTerre.values) t: t.libelle},
+                onChanged: (v) => n.modifier((x) => x.copyWith(terre: v)),
+              ),
+            ],
+          ),
+        ),
       ],
     );
   }
@@ -186,6 +202,11 @@ class _Resultat extends ConsumerWidget {
             '${fmt(r.thermique!)} mm²',
           ),
         LigneDetail('Plus grande exigence', '${fmt(r.calculee)} mm²'),
+        if (e.terre != NatureTerre.aucun)
+          LigneDetail(
+            'Conducteur de terre',
+            '${fmtCompact(sectionConducteurTerre(e.terre, r.retenue))} mm²',
+          ),
       ],
       pied:
           'NF C 15-100-1 (août 2024), partie 5-54 : tableau 54.3 et valeurs '

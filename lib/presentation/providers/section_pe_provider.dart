@@ -16,6 +16,7 @@ class SectionPeEntree {
     this.verifierThermique = false,
     this.ikKa = 10,
     this.temps = 0.2,
+    this.terre = NatureTerre.aucun,
   });
 
   final double sectionPhase;
@@ -32,6 +33,9 @@ class SectionPeEntree {
   final bool verifierThermique;
   final double ikKa;
   final double temps;
+
+  /// Conducteur de terre (tableau 54.2) : calculé en plus du PE si choisi.
+  final NatureTerre terre;
 
   /// true : PE hors de la canalisation d'alimentation (la gaine métallique
   /// d'un câble en fait partie).
@@ -50,6 +54,7 @@ class SectionPeEntree {
     bool? verifierThermique,
     double? ikKa,
     double? temps,
+    NatureTerre? terre,
   }) {
     final sit = situation ?? this.situation;
     final nbLignes = lignesK(sit).length;
@@ -69,6 +74,7 @@ class SectionPeEntree {
       verifierThermique: verifierThermique ?? this.verifierThermique,
       ikKa: ikKa ?? this.ikKa,
       temps: temps ?? this.temps,
+      terre: terre ?? this.terre,
     );
   }
 }

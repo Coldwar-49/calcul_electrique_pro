@@ -142,6 +142,11 @@ const Map<String, String> _aides = {
       'Tension composée entre phases, utilisée en régime IT sans neutre '
       'distribué.',
   'Tension': 'Tension d\'alimentation du récepteur ou du circuit, en volts.',
+  'Conducteur de terre':
+      'Conducteur reliant la borne principale de terre à la prise de terre. '
+          'Enterré, sa section minimale dépend de sa nature (tableau 54.2) ; '
+          'l\'aluminium est interdit. Dans tous les cas il doit aussi '
+          'respecter l\'art. 543.1 (comme le PE).',
   'Alimentation du moteur':
       'Moteur monophasé 230 V ou triphasé 400 V : les limites du tableau '
           'dépendent du type d\'alimentation.',

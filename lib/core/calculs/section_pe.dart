@@ -123,3 +123,28 @@ ResultatSectionPe calculerSectionPe({
   }
   return r;
 }
+
+/// Conducteur de terre (NF C 15-100-1 2024, art. 542.3.1 et tableau 54.2).
+///
+/// Enterré, sa section doit respecter le tableau 54.2 en plus de l'art. 543.1.
+/// L'aluminium ne doit pas être utilisé comme conducteur de terre.
+enum NatureTerre {
+  aucun('Non calculé', 0),
+  nonEnterre('Non enterré (mêmes règles que le PE)', 0),
+  enterreIsole('Enterré, isolé (cuivre)', 16),
+  enterreNuCuivre('Enterré, nu (cuivre)', 25),
+  enterreNuAcier('Enterré, nu (acier galvanisé ou inox)', 50);
+
+  const NatureTerre(this.libelle, this.sectionTableau542);
+  final String libelle;
+
+  /// Section minimale du tableau 54.2 (mm²), 0 si non enterré.
+  final double sectionTableau542;
+}
+
+/// Section minimale du conducteur de terre : plus grande des exigences du
+/// tableau 54.2 (si enterré) et de [exigencePe] (art. 543.1, déjà calculée
+/// pour le PE), arrondie à la section normalisée supérieure.
+double sectionConducteurTerre(NatureTerre nature, double exigencePe) =>
+    sectionNormaliseeSuperieure(
+        math.max(nature.sectionTableau542, exigencePe));

@@ -122,4 +122,14 @@ void main() {
     expect(r.thermique, closeTo(31.2736, 1e-3));
     expect(r.retenue, 35);
   });
+
+  test('conducteur de terre enterré (tableau 54.2, NF C 15-100-1 2024)', () {
+    expect(sectionConducteurTerre(NatureTerre.enterreIsole, 6), 16);
+    expect(sectionConducteurTerre(NatureTerre.enterreNuCuivre, 6), 25);
+    expect(sectionConducteurTerre(NatureTerre.enterreNuAcier, 6), 50);
+    // L'exigence de l'art. 543.1 l'emporte si elle est plus forte.
+    expect(sectionConducteurTerre(NatureTerre.enterreNuCuivre, 35), 35);
+    // Non enterré : mêmes règles que le PE.
+    expect(sectionConducteurTerre(NatureTerre.nonEnterre, 10), 10);
+  });
 }
