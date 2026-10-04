@@ -235,6 +235,35 @@ const Map<String, String> _aides = {
       'Tension de contact maximale admissible (50 V en général, 25 V dans '
       'certains locaux : à confirmer dans l\'article de la norme).',
 
+  // --- Section du PE ---
+  'Âme de la phase': 'Matière du conducteur de phase : cuivre ou aluminium.',
+  'Âme du PE':
+      'Matière du conducteur de protection. Si elle diffère de celle de la '
+          'phase, la section du tableau 3 est multipliée par k1 / k2.',
+  'Isolant de la phase':
+      'Isolant du conducteur de phase : il fixe le coefficient k1.',
+  'Situation du PE':
+      'Façon dont le conducteur de protection est installé (dans le câble, '
+          'séparé, nu, enterré ou non). Elle sélectionne le tableau 54A.x de '
+          'la norme donnant le coefficient k2.',
+  'Isolant ou conditions du PE':
+      'Isolant du PE (ou nature de la gaine, conditions d\'installation pour '
+          'un PE nu) : il fixe le coefficient k2.',
+  'Isolant du PE':
+      'Isolant (ou PE nu) du conducteur de protection : il fixe le '
+          'coefficient k2 utilisé si les métaux diffèrent ou pour la '
+          'vérification thermique.',
+  'Protection mécanique du PE':
+      'Un PE hors canalisation protégé mécaniquement (conduit, goulotte…) '
+          'peut descendre à 2,5 mm² Cu ; sinon 4 mm² Cu. En aluminium : '
+          '35 mm² dans les deux cas.',
+  'Courant de défaut Ik':
+      'Courant de défaut que le PE doit pouvoir supporter, en kA (valeur '
+          'maximale au point considéré).',
+  'Durée de coupure t':
+      'Temps de fonctionnement de la protection pour ce courant, en '
+          'secondes (la formule n\'est valable que jusqu\'à 5 s).',
+
   // --- Règle du triangle ---
   'Section S1 (mm²)':
       'Section du câble principal S1, protégé par le '

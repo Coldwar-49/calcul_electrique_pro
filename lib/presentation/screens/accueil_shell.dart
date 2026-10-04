@@ -18,6 +18,7 @@ import 'pouvoir_de_coupure_screen.dart';
 import 'protection_tt_screen.dart';
 import 'regle_triangle_screen.dart';
 import 'resistance_pe_screen.dart';
+import 'section_pe_screen.dart';
 import 'surcharges_screen.dart';
 
 class _Destination {
@@ -131,6 +132,12 @@ const _groupes = [
       Icons.vertical_align_bottom_outlined,
       Icons.vertical_align_bottom,
       ResistancePeScreen(),
+    ),
+    _Destination(
+      'Section du PE',
+      Icons.vertical_align_center_outlined,
+      Icons.vertical_align_center,
+      SectionPeScreen(),
     ),
   ]),
   _Groupe('Références', [

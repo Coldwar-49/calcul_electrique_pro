@@ -7,8 +7,11 @@ import 'package:flutter_test/flutter_test.dart';
 
 /// Ouvre l'application. [deplier] : déplie toutes les rubriques du menu fixe
 /// (elles sont repliées au départ, sauf celle de l'écran affiché).
-Future<void> _ouvrir(WidgetTester tester, Size taille,
-    {bool deplier = true}) async {
+Future<void> _ouvrir(
+  WidgetTester tester,
+  Size taille, {
+  bool deplier = true,
+}) async {
   tester.view.physicalSize = taille;
   tester.view.devicePixelRatio = 1;
   addTearDown(tester.view.reset);
@@ -27,11 +30,18 @@ Future<void> _ouvrir(WidgetTester tester, Size taille,
 Future<void> _deplierToutes(WidgetTester tester, Finder dans) async {
   for (final r in ['COURT-CIRCUIT', 'PROTECTION', 'RÉFÉRENCES']) {
     final titre = find.descendant(of: dans, matching: find.text(r));
-    await tester.scrollUntilVisible(titre, 100,
-        scrollable: find.descendant(of: dans, matching: find.byType(Scrollable)));
-    final entete = find.ancestor(of: titre, matching: find.byType(InkWell)).first;
-    final repliee =
-        find.descendant(of: entete, matching: find.byIcon(Icons.expand_more));
+    await tester.scrollUntilVisible(
+      titre,
+      100,
+      scrollable: find.descendant(of: dans, matching: find.byType(Scrollable)),
+    );
+    final entete = find
+        .ancestor(of: titre, matching: find.byType(InkWell))
+        .first;
+    final repliee = find.descendant(
+      of: entete,
+      matching: find.byIcon(Icons.expand_more),
+    );
     if (repliee.evaluate().isEmpty) continue;
     await tester.tap(titre);
     await tester.pumpAndSettle();
@@ -54,6 +64,7 @@ const _libelles = [
   'Pouvoir de coupure',
   'Protection TT par DDR',
   'Résistance du PE',
+  'Section du PE',
   'Influences externes',
 ];
 
@@ -68,13 +79,16 @@ void main() {
     await tester.tap(find.text('Manuel'));
     await tester.pump();
     await tester.enterText(
-        find.widgetWithText(TextFormField, 'Coefficient K'), '0,5');
+      find.widgetWithText(TextFormField, 'Coefficient K'),
+      '0,5',
+    );
     await tester.pump();
     expect(find.text('32'), findsOneWidget);
   });
 
-  testWidgets('chute de tension : navigation, ajout de tronçon',
-      (tester) async {
+  testWidgets('chute de tension : navigation, ajout de tronçon', (
+    tester,
+  ) async {
     await _ouvrir(tester, const Size(1400, 1000));
 
     await tester.tap(find.text('Chute de tension').first);
@@ -86,8 +100,9 @@ void main() {
     expect(find.text('Tronçon 2'), findsOneWidget);
   });
 
-  testWidgets('contrainte thermique : cas de référence et crédit auteur',
-      (tester) async {
+  testWidgets('contrainte thermique : cas de référence et crédit auteur', (
+    tester,
+  ) async {
     await _ouvrir(tester, const Size(1400, 1000));
 
     expect(find.text('Créé par Devismes Fabrice'), findsOneWidget);
@@ -106,8 +121,9 @@ void main() {
     expect(find.text('Conforme (T ≤ 5 s)'), findsOneWidget);
   });
 
-  testWidgets('bulle d\'aide : survol de « Pcc amont » dans Ik max',
-      (tester) async {
+  testWidgets('bulle d\'aide : survol de « Pcc amont » dans Ik max', (
+    tester,
+  ) async {
     await _ouvrir(tester, const Size(1400, 1100));
     await tester.tap(find.text('Ik max').first);
     await tester.pumpAndSettle();
@@ -117,8 +133,10 @@ void main() {
     addTearDown(souris.removePointer);
     await souris.moveTo(tester.getCenter(find.text('Pcc amont').first));
     await tester.pump(const Duration(seconds: 1));
-    expect(find.textContaining('Puissance de court-circuit du réseau'),
-        findsOneWidget);
+    expect(
+      find.textContaining('Puissance de court-circuit du réseau'),
+      findsOneWidget,
+    );
   });
 
   testWidgets('Ik max : TGBT du cas de référence', (tester) async {
@@ -137,8 +155,9 @@ void main() {
     expect(find.text('Liaison TD1 → TD2'), findsOneWidget);
   });
 
-  testWidgets('Ik max : listes P transfo / Ucc / U0 et « Autre valeur »',
-      (tester) async {
+  testWidgets('Ik max : listes P transfo / Ucc / U0 et « Autre valeur »', (
+    tester,
+  ) async {
     await _ouvrir(tester, const Size(1400, 1100));
     await tester.tap(find.text('Ik max').first);
     await tester.pumpAndSettle();
@@ -195,7 +214,9 @@ void main() {
     expect(find.text('Bleu'), findsNothing);
   });
 
-  testWidgets('Ik min : transformateur puis groupe électrogène', (tester) async {
+  testWidgets('Ik min : transformateur puis groupe électrogène', (
+    tester,
+  ) async {
     await _ouvrir(tester, const Size(1400, 1200));
 
     await tester.tap(find.text('Ik min').first);
@@ -213,14 +234,17 @@ void main() {
     expect(find.text('Sans protection'), findsNothing);
   });
 
-  testWidgets('Contacts indirects : disjoncteur, fusible et avertissements',
-      (tester) async {
+  testWidgets('Contacts indirects : disjoncteur, fusible et avertissements', (
+    tester,
+  ) async {
     await _ouvrir(tester, const Size(1400, 1400));
 
     await tester.tap(find.text('Contacts indirects').first);
     await tester.pumpAndSettle();
-    expect(find.textContaining('ne remplace ni un logiciel de calcul agréé'),
-        findsOneWidget);
+    expect(
+      find.textContaining('ne remplace ni un logiciel de calcul agréé'),
+      findsOneWidget,
+    );
     // C 10 A, 2,5 mm² cuivre, 230 V, TN : 0,8·230·2,5/(2·0,023·10·10) = 100 m.
     expect(find.text('100,0'), findsWidgets);
     expect(find.byIcon(Icons.warning_amber_rounded), findsNothing);
@@ -239,8 +263,9 @@ void main() {
     expect(find.textContaining('1,88'), findsWidgets);
   });
 
-  testWidgets('Influences externes : niveaux par défaut puis immersion',
-      (tester) async {
+  testWidgets('Influences externes : niveaux par défaut puis immersion', (
+    tester,
+  ) async {
     await _ouvrir(tester, const Size(1400, 1600));
 
     await tester.tap(find.text('Influences externes').first);
@@ -266,8 +291,10 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Filiation').first, findsOneWidget);
     // Par défaut : 2012, 400 V, premier tableau, premiers appareils, Ik 10 kA.
-    expect(find.textContaining('Pouvoir de coupure renforcé de'),
-        findsOneWidget);
+    expect(
+      find.textContaining('Pouvoir de coupure renforcé de'),
+      findsOneWidget,
+    );
     expect(find.textContaining('Amonts possibles pour'), findsOneWidget);
 
     // Changer le catalogue recharge les tableaux sans erreur.
@@ -279,29 +306,36 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('Pouvoir de coupure : IT, fusibles, disjoncteurs moteurs',
-      (tester) async {
+  testWidgets('Pouvoir de coupure : IT, fusibles, disjoncteurs moteurs', (
+    tester,
+  ) async {
     await _ouvrir(tester, const Size(1400, 1400));
 
     await tester.tap(find.text('Pouvoir de coupure').first);
     await tester.pumpAndSettle();
     // DT 40 : 2 kA, Id2 = 3 kA par défaut -> insuffisant.
-    expect(find.text('Pouvoir de coupure insuffisant (Id2 = 3 kA)'),
-        findsOneWidget);
+    expect(
+      find.text('Pouvoir de coupure insuffisant (Id2 = 3 kA)'),
+      findsOneWidget,
+    );
 
     // Fusibles gG 16 A, 8,5 x 31,5 : 20 kA, Ik 10 kA -> suffisant.
     await tester.tap(find.text('Fusibles'));
     await tester.pumpAndSettle();
-    expect(find.text('Pouvoir de coupure suffisant (Ik = 10 kA)'),
-        findsOneWidget);
+    expect(
+      find.text('Pouvoir de coupure suffisant (Ik = 10 kA)'),
+      findsOneWidget,
+    );
     expect(find.text('Fusibles à couteaux'), findsOneWidget);
 
     // Disjoncteurs moteurs : GV2 ME 01 à 08, 10, 14 = 100 kA.
     await tester.tap(find.text('Disj. moteurs'));
     await tester.pumpAndSettle();
     expect(find.text('Pdc — GV2 ME 01 à 08, 10, 14'), findsOneWidget);
-    expect(find.text('Pouvoir de coupure suffisant (Ik = 10 kA)'),
-        findsOneWidget);
+    expect(
+      find.text('Pouvoir de coupure suffisant (Ik = 10 kA)'),
+      findsOneWidget,
+    );
   });
 
   testWidgets('Résistance du PE : disjoncteur puis fusibles', (tester) async {
@@ -331,13 +365,16 @@ void main() {
     expect(find.text('Conforme : 10 m distribués'), findsOneWidget);
 
     await tester.enterText(
-        find.widgetWithText(TextFormField, 'Longueur distribuée de S2'), '14');
+      find.widgetWithText(TextFormField, 'Longueur distribuée de S2'),
+      '14',
+    );
     await tester.pump();
     expect(find.text('Non conforme : 14 m distribués'), findsOneWidget);
   });
 
-  testWidgets('menu à gauche : rubriques et entrées par ordre alphabétique',
-      (tester) async {
+  testWidgets('menu à gauche : rubriques et entrées par ordre alphabétique', (
+    tester,
+  ) async {
     const rubriques = ['CIRCUITS', 'COURT-CIRCUIT', 'PROTECTION', 'RÉFÉRENCES'];
     const entrees = [
       'Bilan de puissance',
@@ -355,6 +392,7 @@ void main() {
       'Pouvoir de coupure',
       'Protection TT par DDR',
       'Résistance du PE',
+      'Section du PE',
       'Influences externes',
     ];
     final menu = find.byKey(const ValueKey('menu-lateral'));
@@ -371,16 +409,31 @@ void main() {
     }
     final textes = [
       for (final t in tester.widgetList<Text>(
-          find.descendant(of: menu, matching: find.byType(Text))))
+        find.descendant(of: menu, matching: find.byType(Text)),
+      ))
         if (t.data != null) t.data!,
     ];
-    expect([for (final t in textes) if (rubriques.contains(t)) t], rubriques);
-    expect([for (final t in textes) if (entrees.contains(t)) t], entrees);
+    expect([
+      for (final t in textes)
+        if (rubriques.contains(t)) t,
+    ], rubriques);
+    expect([
+      for (final t in textes)
+        if (entrees.contains(t)) t,
+    ], entrees);
     // Ordre complet : chaque rubrique est suivie de ses entrées.
-    expect(textes.indexOf('CIRCUITS'), lessThan(textes.indexOf('Bilan de puissance')));
-    expect(textes.indexOf('Surcharges'), lessThan(textes.indexOf('COURT-CIRCUIT')));
-    expect(textes.indexOf('Résistance du PE'),
-        lessThan(textes.indexOf('RÉFÉRENCES')));
+    expect(
+      textes.indexOf('CIRCUITS'),
+      lessThan(textes.indexOf('Bilan de puissance')),
+    );
+    expect(
+      textes.indexOf('Surcharges'),
+      lessThan(textes.indexOf('COURT-CIRCUIT')),
+    );
+    expect(
+      textes.indexOf('Résistance du PE'),
+      lessThan(textes.indexOf('RÉFÉRENCES')),
+    );
 
     // Fenêtre étroite (600 à 900 px) : menu fixe à gauche, icônes seules.
     await _ouvrir(tester, const Size(700, 1300));
@@ -389,42 +442,55 @@ void main() {
     expect(tester.getSize(menu).width, 80);
     final infobulles = [
       for (final t in tester.widgetList<Tooltip>(
-          find.descendant(of: menu, matching: find.byType(Tooltip))))
+        find.descendant(of: menu, matching: find.byType(Tooltip)),
+      ))
         t.message!,
     ];
     expect(infobulles, entrees);
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('menu à gauche : défile dans une fenêtre basse, dernière entrée atteignable',
-      (tester) async {
-    // 1400 x 360 : bien trop bas pour 11 entrées et 4 rubriques.
-    await _ouvrir(tester, const Size(1400, 360), deplier: false);
-    expect(tester.takeException(), isNull);
+  testWidgets(
+    'menu à gauche : défile dans une fenêtre basse, dernière entrée atteignable',
+    (tester) async {
+      // 1400 x 360 : bien trop bas pour 11 entrées et 4 rubriques.
+      await _ouvrir(tester, const Size(1400, 360), deplier: false);
+      expect(tester.takeException(), isNull);
 
-    final menu = find.byKey(const ValueKey('menu-lateral'));
-    await _deplierToutes(tester, menu);
-    // La dernière entrée n'est pas encore affichée (liste défilante)…
-    final derniere =
-        find.descendant(of: menu, matching: find.text('Influences externes'));
-    expect(derniere, findsNothing);
-    // …mais on peut y accéder en faisant défiler le menu,
-    await tester.scrollUntilVisible(derniere, 100,
-        scrollable:
-            find.descendant(of: menu, matching: find.byType(Scrollable)));
-    await tester.pumpAndSettle();
-    expect(derniere, findsOneWidget);
-    expect(tester.getTopLeft(derniere).dy, lessThan(360));
-    // …et le crédit reste visible en bas, sans défilement.
-    final credit = find.descendant(
-        of: menu, matching: find.text('Créé par Devismes Fabrice'));
-    expect(credit, findsOneWidget);
-    expect(tester.getTopLeft(credit).dy, lessThan(360));
-    expect(tester.takeException(), isNull);
-  });
+      final menu = find.byKey(const ValueKey('menu-lateral'));
+      await _deplierToutes(tester, menu);
+      // La dernière entrée n'est pas encore affichée (liste défilante)…
+      final derniere = find.descendant(
+        of: menu,
+        matching: find.text('Influences externes'),
+      );
+      expect(derniere, findsNothing);
+      // …mais on peut y accéder en faisant défiler le menu,
+      await tester.scrollUntilVisible(
+        derniere,
+        100,
+        scrollable: find.descendant(
+          of: menu,
+          matching: find.byType(Scrollable),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(derniere, findsOneWidget);
+      expect(tester.getTopLeft(derniere).dy, lessThan(360));
+      // …et le crédit reste visible en bas, sans défilement.
+      final credit = find.descendant(
+        of: menu,
+        matching: find.text('Créé par Devismes Fabrice'),
+      );
+      expect(credit, findsOneWidget);
+      expect(tester.getTopLeft(credit).dy, lessThan(360));
+      expect(tester.takeException(), isNull);
+    },
+  );
 
-  testWidgets('téléphone : menu latéral, 16 écrans sans débordement',
-      (tester) async {
+  testWidgets('téléphone : menu latéral, 16 écrans sans débordement', (
+    tester,
+  ) async {
     await _ouvrir(tester, const Size(390, 844), deplier: false);
 
     expect(find.byKey(const ValueKey('menu-lateral')), findsNothing);
@@ -434,15 +500,32 @@ void main() {
       await tester.tap(find.byTooltip('Menu').first);
       await tester.pumpAndSettle();
       await _deplierToutes(tester, find.byType(Drawer));
+      // Remonte en haut de la liste (paresseuse) avant de chercher l'entrée.
+      await tester.drag(
+        find.descendant(
+          of: find.byType(Drawer),
+          matching: find.byType(Scrollable),
+        ),
+        const Offset(0, 5000),
+      );
+      await tester.pumpAndSettle();
       await tester.scrollUntilVisible(
-          find.descendant(
-              of: find.byType(Drawer),
-              matching: find.text(_libelles[i])),
-          100,
-          scrollable: find.descendant(
-              of: find.byType(Drawer), matching: find.byType(Scrollable)));
-      await tester.tap(find.descendant(
-          of: find.byType(Drawer), matching: find.text(_libelles[i])));
+        find.descendant(
+          of: find.byType(Drawer),
+          matching: find.text(_libelles[i]),
+        ),
+        100,
+        scrollable: find.descendant(
+          of: find.byType(Drawer),
+          matching: find.byType(Scrollable),
+        ),
+      );
+      await tester.tap(
+        find.descendant(
+          of: find.byType(Drawer),
+          matching: find.text(_libelles[i]),
+        ),
+      );
       await tester.pumpAndSettle();
       expect(tester.takeException(), isNull, reason: 'écran $i');
     }
