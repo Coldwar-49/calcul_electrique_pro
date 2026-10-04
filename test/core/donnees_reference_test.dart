@@ -4,6 +4,7 @@ import 'package:calcul_electrique_pro/core/calculs/influences_externes.dart';
 import 'package:calcul_electrique_pro/core/donnees/choix_table_article.dart';
 import 'package:calcul_electrique_pro/core/donnees/influences.dart';
 import 'package:calcul_electrique_pro/core/donnees/influences_cables_conduits.dart';
+import 'package:calcul_electrique_pro/core/donnees/types.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 ResultatInfluences cable(String nom, Map<String, int> niveaux) => evaluerType(
@@ -48,13 +49,13 @@ void main() {
 
   group('Influences externes — câbles (niveaux par défaut)', () {
     test('tous les câbles conviennent aux niveaux par défaut', () {
-      for (final r in evaluerCables(niveaux())) {
+      for (final r in evaluerCables(niveaux(), edition: EditionNorme.norme2013)) {
         expect(r.convient, isTrue, reason: r.type.nom);
       }
     });
 
     test('conduits : seuls MRL, CSA et Moulures Bois restent contraints (BC)', () {
-      for (final r in evaluerConduits(niveaux())) {
+      for (final r in evaluerConduits(niveaux(), edition: EditionNorme.norme2013)) {
         if (['MRL', 'CSA', 'Moulures Bois'].contains(r.type.nom)) {
           expect(r.contraintes, ['BC'], reason: r.type.nom);
           expect(r.type.usageCourant, isFalse);

@@ -278,6 +278,11 @@ void main() {
 
     await tester.tap(find.text('Influences externes').first);
     await tester.pumpAndSettle();
+    // Norme 2024 par défaut : H05VV-F (AA5 à 6) ne convient pas à AA4.
+    expect(find.text('7 / 8'), findsOneWidget);
+    // Seuils du classeur (2013).
+    await tester.tap(find.text('Seuils du classeur (2013)'));
+    await tester.pumpAndSettle();
     // Niveaux par défaut : les 8 câbles conviennent, 6 conduits sur 9.
     expect(find.text('8 / 8'), findsOneWidget);
     expect(find.text('6 / 9'), findsOneWidget);

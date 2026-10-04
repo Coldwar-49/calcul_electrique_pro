@@ -6,7 +6,8 @@
 library;
 
 import '../donnees/influences.dart';
-import '../donnees/influences_cables_conduits.dart';
+import '../donnees/influences_2024.dart';
+import '../donnees/types.dart';
 
 /// Ordre dans lequel le classeur concatène les influences contraignantes.
 const List<String> ordreContraintes = [
@@ -60,8 +61,16 @@ ResultatInfluences evaluerType(TypeInfluence type, Map<String, int> niveaux) {
   );
 }
 
-List<ResultatInfluences> evaluerCables(Map<String, int> niveaux) =>
-    [for (final t in typesCables) evaluerType(t, niveaux)];
+/// [edition] : `normeActuelle` = tableaux 52.3A / 52.4 de la NF C 15-100-1
+/// (2024), `norme2013` = classeur.
+List<ResultatInfluences> evaluerCables(
+  Map<String, int> niveaux, {
+  EditionNorme edition = EditionNorme.normeActuelle,
+}) =>
+    [for (final t in cablesPourEdition(edition)) evaluerType(t, niveaux)];
 
-List<ResultatInfluences> evaluerConduits(Map<String, int> niveaux) =>
-    [for (final t in typesConduits) evaluerType(t, niveaux)];
+List<ResultatInfluences> evaluerConduits(
+  Map<String, int> niveaux, {
+  EditionNorme edition = EditionNorme.normeActuelle,
+}) =>
+    [for (final t in conduitsPourEdition(edition)) evaluerType(t, niveaux)];

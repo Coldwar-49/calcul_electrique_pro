@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/calculs/influences_externes.dart';
 import '../../core/donnees/influences.dart';
+import '../../core/donnees/types.dart';
 import '../providers/donnees_reference_provider.dart';
 import '../widgets/carte_section.dart';
 import '../widgets/liste_deroulante.dart';
@@ -38,7 +39,20 @@ class _Formulaire extends ConsumerWidget {
     return CarteSection(
       titre: 'Conditions d\'emploi',
       icone: Icons.thermostat_outlined,
-      child: GrilleChamps(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          SwitchListTile(
+            contentPadding: EdgeInsets.zero,
+            title: const Text('Seuils du classeur (2013)'),
+            subtitle: const Text(
+                'Sinon : tableaux 52.3A et 52.4 de la NF C 15-100-1 (2024).'),
+            value: ref.watch(editionInfluencesProvider) ==
+                EditionNorme.norme2013,
+            onChanged: (v) => ref.read(editionInfluencesProvider.notifier).choisir(
+                v ? EditionNorme.norme2013 : EditionNorme.normeActuelle),
+          ),
+          GrilleChamps(
         largeurMin: 300,
         children: [
           for (final code in ordreSaisieInfluences)
@@ -53,6 +67,8 @@ class _Formulaire extends ConsumerWidget {
               },
               onChanged: (v) => n.definir(code, v),
             ),
+        ],
+          ),
         ],
       ),
     );
