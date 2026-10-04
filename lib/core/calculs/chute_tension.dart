@@ -68,6 +68,7 @@ class LigneChuteTension {
     this.ib = 10,
     this.tarif = Tarif.bleu,
     this.usage = UsageCircuit.eclairage,
+    this.resistivite = ResistiviteService.classeur,
   });
 
   final SchemaCircuit circuit;
@@ -81,6 +82,9 @@ class LigneChuteTension {
   final Tarif tarif;
   final UsageCircuit usage;
 
+  /// Résistivité de l'âme à la température de service (tableau 52.24).
+  final ResistiviteService resistivite;
+
   LigneChuteTension copyWith({
     SchemaCircuit? circuit,
     double? u0,
@@ -92,6 +96,7 @@ class LigneChuteTension {
     double? ib,
     Tarif? tarif,
     UsageCircuit? usage,
+    ResistiviteService? resistivite,
   }) => LigneChuteTension(
     circuit: circuit ?? this.circuit,
     u0: u0 ?? this.u0,
@@ -103,6 +108,7 @@ class LigneChuteTension {
     ib: ib ?? this.ib,
     tarif: tarif ?? this.tarif,
     usage: usage ?? this.usage,
+    resistivite: resistivite ?? this.resistivite,
   );
 }
 
@@ -137,7 +143,7 @@ double chuteTensionTroncon(LigneChuteTension l) {
   final s = corrigerSection(l.section);
   return (l.circuit.coefficientB / l.nbConducteursParPole) *
       l.ib *
-      ((rhoChuteTension(l.ame) * l.longueur * l.cosPhi / s) +
+      ((l.resistivite.pour(l.ame) * l.longueur * l.cosPhi / s) +
           (reactanceLineique * l.longueur * math.sin(phi)));
 }
 

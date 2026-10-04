@@ -142,6 +142,18 @@ const Map<String, String> _aides = {
       'Tension composée entre phases, utilisée en régime IT sans neutre '
       'distribué.',
   'Tension': 'Tension d\'alimentation du récepteur ou du circuit, en volts.',
+  'Taux d\'harmoniques de rang 3':
+      'Part des harmoniques de rang 3 (et multiples de 3) dans le courant '
+          'de phase, en %. Elles s\'additionnent dans le neutre. Au-delà de '
+          '15 %, le tableau 52.20 impose un coefficient ; au-delà de 33 %, '
+          'le neutre dimensionne le câble.',
+  'Câbles du circuit triphasé':
+      'Câble multiconducteur (phases et neutre dans le même câble) ou câbles '
+          'monoconducteurs : le tableau 52.20 distingue les deux cas.',
+  'Résistivité ρ (isolant et température)':
+      'Résistivité de l\'âme à la température de service normale, selon '
+          'l\'isolant (tableau 52.24 de la NF C 15-100-1, 2024). « Valeur du '
+          'classeur » garde les valeurs 0,023 (Cu) et 0,037 (Al).',
   'cos φ':
       'Facteur de puissance du récepteur : rapport entre puissance active '
       'et puissance apparente.',

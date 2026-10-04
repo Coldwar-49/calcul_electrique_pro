@@ -108,8 +108,12 @@ double k3Couches(int nombre) {
 /// Risque BE3.
 double kRisqueBe3(bool oui) => oui ? 0.85 : 1;
 
-/// Taux d'harmoniques de rang 3 > 15 %.
-double kHarmoniques(bool oui) => oui ? 0.84 : 1;
+/// Taux d'harmoniques de rang 3 entre 15 et 33 % : 0,86 (NF C 15-100-1, 2024,
+/// tableau 52.20, cas 2 : IB de phase = IB / 0,86) ; le classeur CLAUREG (2013)
+/// utilise 0,84. Au-delà de 33 %, c'est le neutre qui dimensionne le câble
+/// (écran « Section du neutre »).
+double kHarmoniques(bool oui, {EditionNorme edition = EditionNorme.normeActuelle}) =>
+    oui ? (edition == EditionNorme.norme2013 ? 0.84 : 0.86) : 1;
 
 /// Symétrie.
 double kSymetrie(bool symetrique) => symetrique ? 1 : 0.8;

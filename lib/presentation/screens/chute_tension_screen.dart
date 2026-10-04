@@ -164,6 +164,14 @@ class _CarteTroncon extends ConsumerWidget {
               },
               onChanged: (v) => maj((x) => x.copyWith(ame: v)),
             ),
+            ListeDeroulante<ResistiviteService>(
+              label: 'Résistivité ρ (isolant et température)',
+              valeur: l.resistivite,
+              options: {
+                for (final r in ResistiviteService.values) r: r.libelle,
+              },
+              onChanged: (v) => maj((x) => x.copyWith(resistivite: v)),
+            ),
             ChampNombre(
               key: ValueKey('cos-$id'),
               label: 'cos φ',

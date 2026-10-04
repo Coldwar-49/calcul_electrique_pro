@@ -18,6 +18,7 @@ import 'pouvoir_de_coupure_screen.dart';
 import 'protection_tt_screen.dart';
 import 'regle_triangle_screen.dart';
 import 'resistance_pe_screen.dart';
+import 'section_neutre_screen.dart';
 import 'section_pe_screen.dart';
 import 'surcharges_screen.dart';
 
@@ -74,6 +75,12 @@ const _groupes = [
       Icons.auto_fix_high_outlined,
       Icons.auto_fix_high,
       DimensionnementScreen(),
+    ),
+    _Destination(
+      'Section du neutre',
+      Icons.waves_outlined,
+      Icons.waves,
+      SectionNeutreScreen(),
     ),
     _Destination(
       'Surcharges',

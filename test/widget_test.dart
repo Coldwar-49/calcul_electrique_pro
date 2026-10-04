@@ -55,6 +55,7 @@ const _libelles = [
   'Contrainte thermique',
   "Courant d'emploi",
   'Dimensionnement',
+  'Section du neutre',
   'Surcharges',
   'Ik max',
   'Ik min',
@@ -383,6 +384,7 @@ void main() {
       'Contrainte thermique',
       "Courant d'emploi",
       'Dimensionnement',
+      'Section du neutre',
       'Surcharges',
       'Ik max',
       'Ik min',
@@ -488,7 +490,7 @@ void main() {
     },
   );
 
-  testWidgets('téléphone : menu latéral, 16 écrans sans débordement', (
+  testWidgets('téléphone : menu latéral, tous les écrans sans débordement', (
     tester,
   ) async {
     await _ouvrir(tester, const Size(390, 844), deplier: false);

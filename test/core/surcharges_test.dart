@@ -48,8 +48,21 @@ void main() {
           tablettePerforee: false,
           nbCouches: 3,
           harmoniquesSup15: true,
+          edition: EditionNorme.norme2013,
           symetrique: false);
       expect(k, closeTo(0.37557273599999996, 1e-12));
+    });
+
+    test('même cas avec K5 = 0,86 (norme 2024, tableau 52.20)', () {
+      final k = coefficientMethodeEF(
+          isolant: Isolant.pvc,
+          temperature: 40,
+          nbCircuits: 2,
+          tablettePerforee: false,
+          nbCouches: 3,
+          harmoniquesSup15: true,
+          symetrique: false);
+      expect(k, closeTo(0.37557273599999996 / 0.84 * 0.86, 1e-12));
     });
 
     test('température hors tableau -> ArgumentError', () {

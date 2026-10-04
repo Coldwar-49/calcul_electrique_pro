@@ -17,6 +17,7 @@ class ParamsK {
     this.tablettePerforee = false,
     this.risqueBe3 = false,
     this.harmoniquesSup15 = false,
+    this.edition = EditionNorme.normeActuelle,
     this.symetrique = true,
     this.distance = DistanceCables.nulle,
     this.k7 = 1,
@@ -29,6 +30,9 @@ class ParamsK {
   final bool tablettePerforee;
   final bool risqueBe3;
   final bool harmoniquesSup15;
+
+  /// Édition pour K5 : 0,86 (2024, tableau 52.20) ou 0,84 (classeur 2013).
+  final EditionNorme edition;
   final bool symetrique;
   final DistanceCables distance;
 
@@ -43,6 +47,7 @@ class ParamsK {
     bool? tablettePerforee,
     bool? risqueBe3,
     bool? harmoniquesSup15,
+    EditionNorme? edition,
     bool? symetrique,
     DistanceCables? distance,
     double? k7,
@@ -55,6 +60,7 @@ class ParamsK {
         tablettePerforee: tablettePerforee ?? this.tablettePerforee,
         risqueBe3: risqueBe3 ?? this.risqueBe3,
         harmoniquesSup15: harmoniquesSup15 ?? this.harmoniquesSup15,
+        edition: edition ?? this.edition,
         symetrique: symetrique ?? this.symetrique,
         distance: distance ?? this.distance,
         k7: k7 ?? this.k7,
@@ -85,6 +91,7 @@ double coefficientPourMode(ModePose mode, Isolant isolant, ParamsK p) {
         nbCouches: p.nbCouches,
         risqueBe3: p.risqueBe3,
         harmoniquesSup15: p.harmoniquesSup15,
+        edition: p.edition,
         k7: p.k7,
         symetrique: p.symetrique),
     ModePose.c => coefficientMethodeC(
@@ -95,6 +102,7 @@ double coefficientPourMode(ModePose mode, Isolant isolant, ParamsK p) {
         nbCouches: p.nbCouches,
         risqueBe3: p.risqueBe3,
         harmoniquesSup15: p.harmoniquesSup15,
+        edition: p.edition,
         k7: p.k7,
         symetrique: p.symetrique),
     ModePose.d => coefficientMethodeD(
@@ -103,6 +111,7 @@ double coefficientPourMode(ModePose mode, Isolant isolant, ParamsK p) {
         k2: k52r(n, p.distance),
         risqueBe3: p.risqueBe3,
         harmoniquesSup15: p.harmoniquesSup15,
+        edition: p.edition,
         symetrique: p.symetrique),
     ModePose.e || ModePose.f => coefficientMethodeEF(
         isolant: isolant,
@@ -112,6 +121,7 @@ double coefficientPourMode(ModePose mode, Isolant isolant, ParamsK p) {
         nbCouches: p.nbCouches,
         risqueBe3: p.risqueBe3,
         harmoniquesSup15: p.harmoniquesSup15,
+        edition: p.edition,
         symetrique: p.symetrique),
   };
 }
@@ -124,6 +134,7 @@ double coefficientMethodeB({
   required int nbCouches,
   bool risqueBe3 = false,
   bool harmoniquesSup15 = false,
+  EditionNorme edition = EditionNorme.normeActuelle,
   double k7 = k7MethodeB,
   bool symetrique = true,
 }) =>
@@ -131,7 +142,7 @@ double coefficientMethodeB({
     k2MethodeB(nbCircuits) *
     k3Couches(nbCouches) *
     kRisqueBe3(risqueBe3) *
-    kHarmoniques(harmoniquesSup15) *
+    kHarmoniques(harmoniquesSup15, edition: edition) *
     k7 *
     kSymetrie(symetrique);
 
@@ -144,6 +155,7 @@ double coefficientMethodeC({
   required int nbCouches,
   bool risqueBe3 = false,
   bool harmoniquesSup15 = false,
+  EditionNorme edition = EditionNorme.normeActuelle,
   double k7 = k7MethodeC,
   bool symetrique = true,
 }) =>
@@ -151,7 +163,7 @@ double coefficientMethodeC({
     k2MethodeC(nbCircuits, plafond: plafond) *
     k3Couches(nbCouches) *
     kRisqueBe3(risqueBe3) *
-    kHarmoniques(harmoniquesSup15) *
+    kHarmoniques(harmoniquesSup15, edition: edition) *
     k7 *
     kSymetrie(symetrique);
 
@@ -165,6 +177,7 @@ double coefficientMethodeD({
   double k4 = 1,
   bool risqueBe3 = false,
   bool harmoniquesSup15 = false,
+  EditionNorme edition = EditionNorme.normeActuelle,
   bool symetrique = true,
   double k8 = 1,
 }) =>
@@ -173,7 +186,7 @@ double coefficientMethodeD({
     k3 *
     k4 *
     kRisqueBe3(risqueBe3) *
-    kHarmoniques(harmoniquesSup15) *
+    kHarmoniques(harmoniquesSup15, edition: edition) *
     kSymetrie(symetrique) *
     k8;
 
@@ -187,11 +200,12 @@ double coefficientMethodeEF({
   required int nbCouches,
   bool risqueBe3 = false,
   bool harmoniquesSup15 = false,
+  EditionNorme edition = EditionNorme.normeActuelle,
   bool symetrique = true,
 }) =>
     k1Temperature(isolant, temperature) *
     k2MethodesEF(nbCircuits, tablettePerforee: tablettePerforee) *
     k3Couches(nbCouches) *
     kRisqueBe3(risqueBe3) *
-    kHarmoniques(harmoniquesSup15) *
+    kHarmoniques(harmoniquesSup15, edition: edition) *
     kSymetrie(symetrique);

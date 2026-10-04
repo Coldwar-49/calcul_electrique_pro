@@ -263,9 +263,29 @@ class _AssistantK extends ConsumerWidget {
               (v) => n.modifierK((k) => k.copyWith(tablettePerforee: v))),
         interrupteur('Risque BE3 (K4 = 0,85)', p.risqueBe3,
             (v) => n.modifierK((k) => k.copyWith(risqueBe3: v))),
-        interrupteur('Harmoniques de rang 3 > 15 % (K5 = 0,84)',
+        interrupteur(
+            p.edition == EditionNorme.norme2013
+                ? 'Harmoniques de rang 3 > 15 % (K5 = 0,84)'
+                : 'Harmoniques de rang 3 de 15 à 33 % (K5 = 0,86)',
             p.harmoniquesSup15,
             (v) => n.modifierK((k) => k.copyWith(harmoniquesSup15: v))),
+        if (p.harmoniquesSup15) ...[
+          interrupteur(
+              'K5 du classeur 2013 (0,84) au lieu de la norme 2024 (0,86)',
+              p.edition == EditionNorme.norme2013,
+              (v) => n.modifierK((k) => k.copyWith(
+                  edition: v
+                      ? EditionNorme.norme2013
+                      : EditionNorme.normeActuelle))),
+          Padding(
+            padding: const EdgeInsets.only(bottom: 4),
+            child: Text(
+              'Au-delà de 33 %, le neutre dimensionne le câble (tableau '
+              '52.20) : voir l\'écran « Section du neutre ».',
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
+          ),
+        ],
         interrupteur('Disposition symétrique (sinon K6 = 0,8)', p.symetrique,
             (v) => n.modifierK((k) => k.copyWith(symetrique: v))),
         if (sol)
