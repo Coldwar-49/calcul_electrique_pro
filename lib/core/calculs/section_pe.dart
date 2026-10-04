@@ -2,10 +2,9 @@
 ///
 /// Tableau 3 : NF C 15-100-1 (août 2024), partie 5-54, art. 543.1, tableau
 /// 54.3 (identique au tableau 3 du guide UTE C 15-106 de 2003).
-/// Formule S = √(I²t) / k, valeurs de k et minima hors canalisation (2,5 / 4 /
-/// 35 mm²) : guide UTE C 15-106 (2003), §4.1 et §4.4, à confirmer dans les
-/// tableaux 54A.2 à 54A.6 et l'art. 543.1.3 de l'édition 2024 (voir
-/// docs/changements_nfc15100.md).
+/// Formule S = √(I²t) / k : art. 543.1.2 ; minima hors canalisation (2,5 / 4 mm²
+/// Cu, 16 mm² Al) : art. 543.1.3 ; valeurs de k : tableaux 54A.2 à 54A.6
+/// (voir docs/changements_nfc15100.md).
 library;
 
 import 'dart:math' as math;
@@ -34,9 +33,10 @@ double sectionPeTableau3(double sectionPhase) {
 }
 
 /// Minimum d'un PE qui ne fait pas partie de la canalisation d'alimentation.
-/// Cuivre : 2,5 mm² protégé mécaniquement, 4 mm² sinon ; aluminium : 35 mm².
+/// Cuivre : 2,5 mm² protégé mécaniquement, 4 mm² sinon ; aluminium : 16 mm²
+/// (art. 543.1.3 de 2024, avec ou sans protection mécanique).
 double minimumHorsCanalisation(Ame ame, {required bool protegeMecaniquement}) =>
-    ame == Ame.aluminium ? 35 : (protegeMecaniquement ? 2.5 : 4);
+    ame == Ame.aluminium ? 16 : (protegeMecaniquement ? 2.5 : 4);
 
 /// Section minimale par la contrainte thermique : S = √(I²t) / k.
 /// [ikA] en ampères, [temps] en secondes (≤ 5 s).

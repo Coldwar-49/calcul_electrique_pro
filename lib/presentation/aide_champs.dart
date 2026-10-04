@@ -256,7 +256,7 @@ const Map<String, String> _aides = {
   'Protection mécanique du PE':
       'Un PE hors canalisation protégé mécaniquement (conduit, goulotte…) '
           'peut descendre à 2,5 mm² Cu ; sinon 4 mm² Cu. En aluminium : '
-          '35 mm² dans les deux cas.',
+          '16 mm² dans les deux cas.',
   'Courant de défaut Ik':
       'Courant de défaut que le PE doit pouvoir supporter, en kA (valeur '
           'maximale au point considéré).',

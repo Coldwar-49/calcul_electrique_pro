@@ -101,7 +101,7 @@ void main() {
       amePe: Ame.aluminium,
       horsCanalisation: true,
     );
-    expect(alu.retenue, 35);
+    expect(alu.retenue, 16);
   });
 
   test('contrainte thermique : √(I²t)/k', () {

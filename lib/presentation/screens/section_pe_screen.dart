@@ -189,9 +189,8 @@ class _Resultat extends ConsumerWidget {
       ],
       pied:
           'NF C 15-100-1 (août 2024), partie 5-54 : tableau 54.3 et valeurs '
-          'de k des tableaux 54A.2 à 54A.6. Minima hors canalisation et '
-          'formule thermique : guide UTE C 15-106 (2003), à confirmer dans '
-          'l\'édition 2024.',
+          'de k des tableaux 54A.2 à 54A.6, art. 543.1.2 (formule thermique) '
+          'et 543.1.3 (minima hors canalisation).',
     );
   }
 }
