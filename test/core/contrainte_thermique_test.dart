@@ -43,13 +43,28 @@ void main() {
     expect(facteurReactance(630), 1.3);
   });
 
-  test('table des k (P7:S18)', () {
+  test('table des k (P7:S18, classeur 2013)', () {
     double k(Ame a, IsolantContrainte i, CanalisationPe c) =>
-        kContrainteThermique(a, i, c);
+        kContrainteThermique(a, i, c, edition: EditionNorme.norme2013);
     expect(k(Ame.cuivre, IsolantContrainte.prEpr, CanalisationPe.meme), 143);
     expect(k(Ame.aluminium, IsolantContrainte.pvcJusqua300, CanalisationPe.meme), 76);
     expect(k(Ame.cuivre, IsolantContrainte.prEpr, CanalisationPe.differentes), 176);
     expect(k(Ame.aluminium, IsolantContrainte.peNuBe23, CanalisationPe.differentes), 91);
+    expect(() => k(Ame.cuivre, IsolantContrainte.peNu, CanalisationPe.meme),
+        throwsArgumentError);
+  });
+
+  test('table des k 2024 (tableaux 43.1, 54A.2A, 54A.6A)', () {
+    double k(Ame a, IsolantContrainte i, CanalisationPe c) =>
+        kContrainteThermique(a, i, c);
+    expect(k(Ame.cuivre, IsolantContrainte.prEpr, CanalisationPe.meme), 138);
+    expect(k(Ame.aluminium, IsolantContrainte.pvcJusqua300, CanalisationPe.meme), 75);
+    expect(k(Ame.cuivre, IsolantContrainte.pvcAudessus300, CanalisationPe.meme), 99);
+    expect(k(Ame.aluminium, IsolantContrainte.pvcAudessus300, CanalisationPe.meme), 67);
+    expect(k(Ame.cuivre, IsolantContrainte.prEpr, CanalisationPe.differentes), 169);
+    expect(k(Ame.aluminium, IsolantContrainte.pvcAudessus300, CanalisationPe.differentes), 87);
+    expect(k(Ame.cuivre, IsolantContrainte.peNu, CanalisationPe.differentes), 153);
+    expect(k(Ame.aluminium, IsolantContrainte.peNuBe23, CanalisationPe.differentes), 90);
     expect(() => k(Ame.cuivre, IsolantContrainte.peNu, CanalisationPe.meme),
         throwsArgumentError);
   });

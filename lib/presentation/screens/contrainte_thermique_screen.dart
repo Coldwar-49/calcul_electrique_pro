@@ -104,6 +104,18 @@ class _Formulaire extends ConsumerWidget {
                 style: Theme.of(context).textTheme.titleMedium,
               ),
             ),
+            SwitchListTile(
+              contentPadding: EdgeInsets.zero,
+              title: const Text('Valeurs de k du classeur (2013)'),
+              subtitle: const Text(
+                  'Sinon : NF C 15-100-1 (2024), tableaux 43.1, 54A.2A, '
+                  '54A.6A.'),
+              value: e.edition == EditionNorme.norme2013,
+              onChanged: (v) => n.modifier((x) => x.copyWith(
+                  edition: v
+                      ? EditionNorme.norme2013
+                      : EditionNorme.normeActuelle)),
+            ),
           ]),
         ),
         const SizedBox(height: 16),
@@ -180,7 +192,10 @@ class _Resultat extends ConsumerWidget {
       ],
       pied: 'Section retenue = la plus petite de la phase et du neutre. '
           'Ik min = 0,8 × U0 / (ρ × L × (Xph/Sph + Xn/Sn)). '
-          'Tables NF C 15-100, valeurs de l\'édition 2013.',
+          '${e.edition == EditionNorme.norme2013 ? 'Valeurs de k du classeur '
+              '(2013).' : 'Valeurs de k : NF C 15-100-1 (2024), art. 434.5.2.'} '
+          'Pour t < 0,1 s (dispositif limiteur), comparer k²S² à l\'énergie '
+          'I²t donnée par le constructeur.',
     );
   }
 }

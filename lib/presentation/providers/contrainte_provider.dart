@@ -17,6 +17,7 @@ class ContrainteEntree {
     this.u0 = 230,
     this.longueur = 70,
     this.ikKa = 10,
+    this.edition = EditionNorme.normeActuelle,
   });
 
   final Protection protection;
@@ -29,6 +30,9 @@ class ContrainteEntree {
   final double longueur;
   final double ikKa;
 
+  /// Édition des valeurs de k : 2024 ou classeur 2013.
+  final EditionNorme edition;
+
   ContrainteEntree copyWith({
     Protection? protection,
     double? sectionPh,
@@ -39,6 +43,7 @@ class ContrainteEntree {
     double? u0,
     double? longueur,
     double? ikKa,
+    EditionNorme? edition,
   }) {
     final nouvelleCanalisation = canalisation ?? this.canalisation;
     var nouvelIsolant = isolant ?? this.isolant;
@@ -56,6 +61,7 @@ class ContrainteEntree {
       u0: u0 ?? this.u0,
       longueur: longueur ?? this.longueur,
       ikKa: ikKa ?? this.ikKa,
+      edition: edition ?? this.edition,
     );
   }
 }
@@ -83,7 +89,12 @@ class ContrainteVue {
 final contrainteVueProvider = Provider<ContrainteVue>((ref) {
   final e = ref.watch(contrainteEntreeProvider);
   try {
-    final k = kContrainteThermique(e.ame, e.isolant, e.canalisation);
+    final k = kContrainteThermique(
+      e.ame,
+      e.isolant,
+      e.canalisation,
+      edition: e.edition,
+    );
     final r = e.protection == Protection.fusible
         ? calculerContrainteFusible(
             sectionPh: e.sectionPh,

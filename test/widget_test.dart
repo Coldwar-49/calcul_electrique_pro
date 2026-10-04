@@ -111,6 +111,13 @@ void main() {
 
     await tester.tap(find.text('Contrainte thermique').first);
     await tester.pumpAndSettle();
+    // Par défaut : k de la norme 2024 (PR/EPR, même canalisation, cuivre : 138).
+    expect(find.text('138'), findsWidgets);
+    expect(find.text('9,28'), findsNothing);
+    // Valeurs du classeur (2013) : k = 143.
+    await tester.tap(find.text('Valeurs de k du classeur (2013)'));
+    await tester.pumpAndSettle();
+    expect(find.text('143'), findsWidgets);
     // 16/16 mm² cuivre, 230 V, 70 m, PR/EPR même canalisation : T = 9,28 s.
     expect(find.text('9,28'), findsOneWidget);
     expect(find.text('Non conforme (T > 5 s)'), findsOneWidget);

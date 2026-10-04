@@ -145,8 +145,8 @@ class _Resultat extends ConsumerWidget {
       ],
       messageStatut: conclusion,
       pied: 'NF C 15-100-1 (2024), tableau 52.20 et art. 524.2.3. Au-dessus '
-          'de 15 %, le coefficient 0,86 est appliqué. Cellule « câbles '
-          'monoconducteurs, TH3 > 45 % » à relire dans la norme.',
+          'de 15 %, le coefficient 0,86 est appliqué (sauf câble '
+          'multiconducteur au-delà de 45 %).',
     );
   }
 }

@@ -129,7 +129,9 @@ ResultatNeutre calculerNeutre({
         neutreReductibleAdmis: false,
       );
     default:
-      final in4 = ib * th3 * 3;
+      // Câble multiconducteur : IB × TH3 × 3 ; câbles monoconducteurs : le
+      // coefficient 0,86 subsiste (tableau 52.20, cas 4).
+      final in4 = mono ? ib * th3 * 3 / 0.86 : ib * th3 * 3;
       return ResultatNeutre(
         cas: 4,
         courantPhase: mono ? ib : in4,

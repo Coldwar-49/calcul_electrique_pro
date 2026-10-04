@@ -35,7 +35,25 @@ List<IsolantContrainte> isolantsContrainte(CanalisationPe c) =>
           ]
         : IsolantContrainte.values;
 
+// Édition 2024 (NF C 15-100-1) : même canalisation = tableau 43.1 / 54A.4,
+// PVC 70 °C et PR/EPR 90 °C ; canalisations différentes = tableaux 54A.2A
+// (isolés), 54A.6A (nu : conditions normales / risque d'incendie).
 // (cuivre, aluminium)
+const Map<IsolantContrainte, (double, double)> _kMeme2024 = {
+  IsolantContrainte.pvcJusqua300: (111, 75),
+  IsolantContrainte.pvcAudessus300: (99, 67),
+  IsolantContrainte.prEpr: (138, 93),
+};
+
+const Map<IsolantContrainte, (double, double)> _kDifferentes2024 = {
+  IsolantContrainte.pvcJusqua300: (138, 93),
+  IsolantContrainte.pvcAudessus300: (128, 87),
+  IsolantContrainte.prEpr: (169, 114),
+  IsolantContrainte.peNu: (153, 103),
+  IsolantContrainte.peNuBe23: (133, 90),
+};
+
+// Édition 2013 (classeur CLAUREG, P7:S18) : (cuivre, aluminium)
 const Map<IsolantContrainte, (double, double)> _kMeme = {
   IsolantContrainte.pvcJusqua300: (115, 76),
   IsolantContrainte.pvcAudessus300: (103, 68),
@@ -51,9 +69,16 @@ const Map<IsolantContrainte, (double, double)> _kDifferentes = {
 };
 
 /// Coefficient k. Lève [ArgumentError] pour une combinaison absente de la table.
+///
+/// [edition] : `normeActuelle` = NF C 15-100-1 (2024), `norme2013` = classeur.
 double kContrainteThermique(
-    Ame ame, IsolantContrainte isolant, CanalisationPe canalisation) {
-  final table = canalisation == CanalisationPe.meme ? _kMeme : _kDifferentes;
+    Ame ame, IsolantContrainte isolant, CanalisationPe canalisation,
+    {EditionNorme edition = EditionNorme.normeActuelle}) {
+  final ancienne = edition == EditionNorme.norme2013;
+  final meme = canalisation == CanalisationPe.meme;
+  final table = meme
+      ? (ancienne ? _kMeme : _kMeme2024)
+      : (ancienne ? _kDifferentes : _kDifferentes2024);
   final k = table[isolant];
   if (k == null) {
     throw ArgumentError(

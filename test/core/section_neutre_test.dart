@@ -59,10 +59,13 @@ void main() {
     expect(m.courantPhase, 100);
   });
 
-  test('cas 4 (> 45 %) : IB neutre = IB × TH3 × 3', () {
+  test('cas 4 (> 45 %) : multiconducteur IB × TH3 × 3, mono ÷ 0,86', () {
     final r = _n(60);
     expect(r.cas, 4);
     expect(r.courantNeutre, closeTo(100 * 0.6 * 3, 1e-9));
+    final m = _n(60, cable: CableNeutre.monoconducteur);
+    expect(m.courantNeutre, closeTo(100 * 0.6 * 3 / 0.86, 1e-9));
+    expect(m.neutreSuperieurPhase, isTrue);
   });
 
   test('monophasé : le neutre porte le courant de la phase', () {
